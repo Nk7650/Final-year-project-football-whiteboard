@@ -10,10 +10,10 @@ A web tactics board where a coach plans formations and pressing as animated keyf
 
 ## The board
 
-`web/index.html` is a single-file analysis board in a broadcast style: draw runs, pass lines, zones, labels and player spotlights; overlay team shape, defensive line, offside line, space control and movement trails; replay tracked matches beside the video; compare against a plan, with key moments flagged and clickable on the timeline. Presentation mode, 3D view and PNG snapshot are built in. Shortcuts: V move, R run, P pass, Z zone, S spotlight, T label, E eraser, K keyframe, Space play, arrows step, Ctrl+Z undo.
+`web/index.html` is a single-file analysis board in a broadcast style: draw runs, pass lines, zones, labels and player spotlights; overlay team shape, defensive line, offside line, space control and movement trails; replay tracked matches beside the video; compare against a plan, with key moments flagged and clickable on the timeline. Three camera views (Broadcast, High, Tactical), presentation mode and PNG snapshot are built in. A demo move plays on open, and "Demo match + plan" loads a synthetic replay with key moments. Shortcuts: V move, R run, P pass, Z zone, S spotlight, T label, E eraser, K keyframe, Space play, arrows step, Ctrl+Z undo.
 
-![Analysis layers](docs/img/03-analysis-layers.png)
-![3D view with space control](docs/img/04-3d-space-control.png)
+![Analysis layers](docs/img/03-broadcast-view.png)
+![3D view with space control](docs/img/04-replay-plan-layers.png)
 
 "Space owned" is the share of pitch closer to each team's nearest player. It is a simple proxy and is not the published pitch-control model.
 

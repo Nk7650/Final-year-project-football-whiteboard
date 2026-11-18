@@ -39,6 +39,7 @@ def page():
         pg.errors = []
         pg.on("pageerror", lambda e: pg.errors.append(str(e)))
         pg.goto(PAGE)
+        pg.evaluate("clearBoard(); setView('top', true)")   # blank board, top-down camera, so pointer maths is simple
         yield pg
         browser.close()
 
@@ -64,9 +65,7 @@ def test_board_loads_with_default_formations_and_metrics(page):
 def test_keyframe_animation_actually_moves_players(page):
     page.click("#addKf")
     initial = float(page.inner_text("#ml0"))                # 25.0: default back line
-    box = page.locator("#c").bounding_box()
-    x0 = box["x"] + box["width"] * (25 / 105)             # home right-back start position
-    y0 = box["y"] + box["height"] * (58 / 68)
+    x0, y0 = page.evaluate("toPage(25, 58)")              # home right-back start position
     page.mouse.move(x0, y0)
     page.mouse.down()
     page.mouse.move(x0 + 200, y0 - 60, steps=5)
@@ -123,12 +122,27 @@ def test_key_moment_is_flagged_and_clicking_it_seeks(page):
 
 
 def test_drawing_tools_add_and_undo_annotations(page):
-    box = page.locator("#c").bounding_box()
+    x0, y0 = page.evaluate("toPage(30, 20)")
     page.click("[data-tool=pass]")
-    page.mouse.move(box["x"] + 200, box["y"] + 200)
+    page.mouse.move(x0, y0)
     page.mouse.down()
-    page.mouse.move(box["x"] + 500, box["y"] + 300, steps=4)
+    page.mouse.move(x0 + 300, y0 + 100, steps=4)
     page.mouse.up()
     assert page.evaluate("ann.length") == 1
     page.click("#undo")
     assert page.evaluate("ann.length") == 0 and not page.errors
+
+
+def test_demo_move_loads_and_plays_on_a_fresh_page():
+    with sync_api.sync_playwright() as p:
+        browser = p.chromium.launch(executable_path=_chrome(), headless=True, args=["--no-sandbox"])
+        pg = browser.new_page(viewport={"width": 1400, "height": 900})
+        errors = []
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.goto(PAGE)
+        assert pg.evaluate("frames.length") == 4          # the demo move is ready before the user does anything
+        pg.click("#play")
+        pg.wait_for_timeout(900)
+        assert 0 < pg.evaluate("u") < 3 and not errors
+        _shot(pg, "05-broadcast-view.png")
+        browser.close()

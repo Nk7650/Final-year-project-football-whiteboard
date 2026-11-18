@@ -6,50 +6,49 @@
 <title>Tactics Lab - match analysis board</title>
 <style>
 :root{
-  --bg:#070b14; --bg2:#0d1424; --panel:#111a2e; --panel2:#16213a; --line:#243252; --text:#e8eefc; --mute:#8a99bd;
-  --accent:#38bdf8; --accent2:#22d3a6; --warn:#fbbf24; --danger:#f87171;
+  --bg:#060912; --bg2:#0b1220; --panel:#0f1729; --panel2:#15203a; --line:#22304f; --text:#e9eefb; --mute:#8696bb;
+  --accent:#3ec1ff; --accent2:#22d3a6; --warn:#fbbf24; --hot:#ff3d71;
   --font: Inter, "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%}
-body{background:radial-gradient(1200px 600px at 20% -10%,#14234a 0%,var(--bg) 60%);color:var(--text);font:14px/1.45 var(--font);display:flex;flex-direction:column;min-height:100vh}
+body{background:radial-gradient(1400px 700px at 15% -15%,#12214a 0%,var(--bg) 62%);color:var(--text);font:14px/1.45 var(--font);display:flex;flex-direction:column;min-height:100vh}
 button,select,input{font:inherit;color:inherit}
 button{cursor:pointer}
-/* header */
-header{display:flex;align-items:center;gap:16px;padding:10px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0d1730,#0a1120)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:13px}
-.logo{width:30px;height:30px;border-radius:8px;background:conic-gradient(from 200deg,var(--accent),var(--accent2),var(--accent));display:grid;place-items:center;box-shadow:0 0 18px #38bdf855}
-.logo svg{width:18px;height:18px}
-.brand small{display:block;font-weight:500;letter-spacing:.06em;color:var(--mute);font-size:11px;text-transform:none}
+header{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0c1630,#091022);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:13px;margin-right:6px}
+.logo{width:32px;height:32px;border-radius:9px;background:conic-gradient(from 200deg,var(--accent),var(--accent2),var(--accent));display:grid;place-items:center;box-shadow:0 0 22px #3ec1ff55}
+.logo svg{width:19px;height:19px}
+.brand small{display:block;font-weight:500;letter-spacing:.05em;color:var(--mute);font-size:11px;text-transform:none}
 .spacer{flex:1}
-.hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;display:inline-flex;gap:6px;align-items:center}
+.hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
 .hbtn:hover{border-color:var(--accent)}
-.hbtn.primary{background:linear-gradient(180deg,#2aa8e8,#1b82c4);border-color:#4cc2ff;font-weight:600}
-.hbtn.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-/* layout */
+.hbtn.primary{background:linear-gradient(180deg,#2cb0f2,#1a86c8);border-color:#5cccff;font-weight:600}
+.hbtn.demo{background:linear-gradient(180deg,#1ecfa0,#13a07c);border-color:#5eeac4;color:#03120d;font-weight:700}
 main{flex:1;display:grid;grid-template-columns:56px minmax(0,1fr) 340px;gap:14px;padding:14px 18px 8px}
 #tools{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px;align-self:start}
 .tool{width:38px;height:38px;border-radius:10px;border:1px solid transparent;background:transparent;display:grid;place-items:center;color:var(--mute);position:relative}
 .tool svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tool:hover{background:var(--panel2);color:var(--text)}
-.tool.on{background:#12304d;color:var(--accent);border-color:var(--accent)}
-.tool[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:46px;top:50%;transform:translateY(-50%);background:#000c;border:1px solid var(--line);padding:3px 8px;border-radius:6px;white-space:nowrap;font-size:12px;color:var(--text);z-index:10}
+.tool.on{background:#10304f;color:var(--accent);border-color:var(--accent)}
+.tool[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:46px;top:50%;transform:translateY(-50%);background:#000d;border:1px solid var(--line);padding:3px 8px;border-radius:6px;white-space:nowrap;font-size:12px;color:var(--text);z-index:30}
 .sep{height:1px;background:var(--line);margin:4px 2px}
 #annCol{width:30px;height:30px;border:0;background:none;padding:0;margin:2px auto;cursor:pointer}
 #stage{min-width:0}
-#pitchBox{background:linear-gradient(180deg,#0b1222,#0a101d);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 20px 60px #0008, inset 0 0 0 1px #ffffff08;perspective:1700px;overflow:hidden}
-#pitchWrap{position:relative;width:min(100%,calc((100vh - 270px)*1.544));min-width:320px;margin:0 auto;transition:transform .6s cubic-bezier(.2,.7,.2,1);transform-origin:50% 70%}
-canvas#c{display:block;width:100%;border-radius:6px;box-shadow:0 14px 40px #000a;touch-action:none}
-video#vid{display:block;width:100%;margin-top:10px;border-radius:10px;background:#000;max-height:30vh}
-.tilt #pitchWrap{transform:rotateX(46deg) scale(.96) translateY(-4%)}
-.tilt #c{pointer-events:none;box-shadow:0 40px 60px #000c}
-#txtIn{position:absolute;z-index:5;background:#0009;border:1px solid var(--accent);border-radius:6px;padding:4px 8px;color:#fff;min-width:140px}
-/* dock */
+#view{position:relative;height:clamp(380px,calc(100vh - 235px),780px);border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 24px 70px #000a;
+  background:radial-gradient(900px 380px at 12% -8%,#27407a66 0,transparent 60%),radial-gradient(900px 380px at 88% -8%,#27407a66 0,transparent 60%),linear-gradient(180deg,#05070f 0,#0a1020 38%,#0d1a22 100%)}
+#ground{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+#fg{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#camBar{position:absolute;right:12px;top:12px;display:flex;gap:2px;background:#050a14cc;border:1px solid var(--line);border-radius:10px;padding:3px;z-index:3;backdrop-filter:blur(6px)}
+#camBar button{background:none;border:0;border-radius:7px;padding:5px 10px;font-size:12px;color:var(--mute)}
+#camBar button.on{background:var(--accent);color:#04121c;font-weight:700}
+#txtIn{position:absolute;z-index:5;background:#000a;border:1px solid var(--accent);border-radius:6px;padding:4px 8px;color:#fff;min-width:150px}
+video#vid{display:block;width:100%;margin-top:10px;border-radius:12px;background:#000;max-height:30vh}
 #dock{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
 .ctl{display:flex;gap:6px;align-items:center}
 .round{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center}
-.round.big{width:48px;height:48px;background:linear-gradient(180deg,#2aa8e8,#1b82c4);border-color:#4cc2ff;font-size:12px;font-weight:700}
+.round.big{width:50px;height:50px;background:linear-gradient(180deg,#2cb0f2,#1a86c8);border-color:#5cccff;font-size:12px;font-weight:700}
 .round svg{width:18px;height:18px;fill:currentColor}
 #timeline{position:relative;padding-top:12px}
 #marks{position:absolute;left:0;right:0;top:0;height:12px;pointer-events:none}
@@ -58,7 +57,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #clock{font:600 15px/1 ui-monospace,Menlo,Consolas,monospace;min-width:70px;text-align:right}
 .mini{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:12px}
 #hint{margin:8px 4px 0;color:var(--mute);font-size:12.5px;min-height:18px}
-/* side panel */
 aside{display:flex;flex-direction:column;gap:12px;min-width:0}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .card h3{margin:0 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700;display:flex;justify-content:space-between;align-items:center}
@@ -85,13 +83,12 @@ td:first-child{font-weight:400;color:var(--mute)}
 .chip.on{border-color:var(--accent)}
 details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
 .lineup{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:8px}
-.lineup div{display:flex;gap:6px;align-items:center}
 .lineup b{font-size:11px;width:16px;color:var(--mute);text-align:right}
 .lineup input{background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:3px 6px;width:100%;font-size:12px}
 .present main{grid-template-columns:1fr}
-.present aside,.present #tools,.present header .hide-present{display:none!important}
-.present #pitchWrap{width:min(100%,calc((100vh - 190px)*1.544))}
-@media(max-width:1100px){main{grid-template-columns:48px minmax(0,1fr)}aside{grid-column:1/-1}#pitchWrap{width:100%}}
+.present aside,.present #tools,.present .hide-present{display:none!important}
+.present #view{height:calc(100vh - 150px)}
+@media(max-width:1100px){main{grid-template-columns:48px minmax(0,1fr)}aside{grid-column:1/-1}}
 @media(max-width:640px){main{grid-template-columns:1fr;padding:10px}#tools{flex-direction:row;flex-wrap:wrap}#dock{grid-template-columns:1fr}}
 </style>
 </head>
@@ -100,9 +97,11 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
   <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#06101f" stroke-width="2.4" stroke-linecap="round"><circle cx="6" cy="17" r="2"/><circle cx="18" cy="7" r="2"/><path d="M8 16c5-1 5-8 8-8"/></svg></div>
     <div>Tactics Lab<small>Plan it. Replay it. Compare it.</small></div></div>
   <span class="spacer"></span>
+  <button id="demoMatch" class="hbtn demo">Demo match + plan</button>
   <span class="hide-present" style="display:contents">
   <button id="addKf" class="hbtn primary">+ Keyframe</button>
   <button id="play2" class="hbtn" aria-label="Play or pause">Play</button>
+  <button id="newBoard" class="hbtn">New board</button>
   <button id="loadTrack" class="hbtn">Load tracking / video</button>
   <button id="loadPlan" class="hbtn">Load plan overlay</button>
   <button id="exportPlan" class="hbtn">Export plan</button>
@@ -110,7 +109,6 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
   <button id="load" class="hbtn">Load board</button>
   </span>
   <button id="png" class="hbtn">Snapshot PNG</button>
-  <button id="tiltBtn" class="hbtn">3D view</button>
   <button id="presentBtn" class="hbtn">Present</button>
   <input type="file" id="file" accept=".json" hidden>
 </header>
@@ -131,13 +129,17 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
   </nav>
 
   <section id="stage">
-    <div id="pitchBox">
-      <div id="pitchWrap">
-        <canvas id="c"></canvas>
-        <input id="txtIn" type="text" placeholder="Type, press Enter" hidden>
+    <div id="view">
+      <canvas id="ground"></canvas>
+      <canvas id="fg"></canvas>
+      <div id="camBar" role="group" aria-label="Camera">
+        <button data-view="broadcast" class="on">Broadcast</button>
+        <button data-view="high">High</button>
+        <button data-view="top">Tactical</button>
       </div>
-      <video id="vid" controls muted playsinline hidden></video>
+      <input id="txtIn" type="text" placeholder="Type, press Enter" hidden>
     </div>
+    <video id="vid" controls muted playsinline hidden></video>
     <div id="dock">
       <div class="ctl">
         <button class="round" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
@@ -150,7 +152,7 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
         <span id="clock">0.0 s</span>
       </div>
     </div>
-    <p id="hint">Drag players to set a shape. Add keyframes and press Play. Pick a tool on the left to draw runs, passes and zones.</p>
+    <p id="hint">A demo move is loaded. Press Play, or drag players to build your own. Try Demo match + plan for the replay and key moments.</p>
   </section>
 
   <aside>
@@ -223,7 +225,7 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
 </main>
 
 <script>
-const W = 105, H = 68;
+const W = 105, H = 68, M = 7, GPX = 12;               // pitch metres, ground margin metres, ground pixels per metre
 const FORM = {
   "4-3-3":   [[5,34],[25,10],[25,26],[25,42],[25,58],[50,14],[50,34],[50,54],[78,12],[78,34],[78,56]],
   "4-4-2":   [[5,34],[25,10],[25,26],[25,42],[25,58],[52,8],[52,26],[52,42],[52,60],[78,26],[78,42]],
@@ -231,15 +233,16 @@ const FORM = {
   "4-2-3-1": [[5,34],[25,10],[25,26],[25,42],[25,58],[44,24],[44,44],[62,12],[62,34],[62,56],[80,34]]
 };
 const C = { home: "#f2c14e", away: "#5fb0e8" };
-const cv = document.getElementById("c"), ctx = cv.getContext("2d");
 const $ = id => document.getElementById(id);
-const vid = $("vid");
+const gc = $("ground"), ctx = gc.getContext("2d");    // ground layer, drawn in metres
+const fgc = $("fg"), fx = fgc.getContext("2d");       // figures and graphics, drawn in screen pixels
+const vid = $("vid"), viewEl = $("view");
 const on = id => $(id).checked;
+const FONT = getComputedStyle(document.body).fontFamily;
 
-let players = [], frames = [], cur = -1;       // frames: arrays of [x, y] x 22
-let track = null;                               // tracking replay {fps, frames}
-let plan = null;                                // plan overlay {fps, frames}, same format as tracking
-let u = 0, playing = false, lastTs = 0, drag = null, scale = 1;
+let players = [], frames = [], cur = -1;       // frames: arrays of [x, y] x 22, then the ball
+let track = null, plan = null;                  // {fps, frames:[{t, players:[{id,team,x,y}]}]}
+let u = 0, playing = false, lastTs = 0, drag = null, dragOff = [0, 0];
 let tool = "move", ann = [], gesture = null, ball = { x: W / 2, y: H / 2 }, moments = [];
 const names = [Array(11).fill(""), Array(11).fill("")];
 
@@ -248,28 +251,37 @@ for (const f of [$("fh"), $("fa")]) for (const k in FORM) f.add(new Option(k, k)
 $("fa").value = "4-4-2";
 
 function setFormation(team, name) {
-  FORM[name].forEach(([d, y], i) => {
-    const p = players[team * 11 + i];
-    p.x = team ? W - d : d; p.y = y;
-  });
+  FORM[name].forEach(([d, y], i) => { const p = players[team * 11 + i]; p.x = team ? W - d : d; p.y = y; });
 }
 setFormation(0, "4-3-3"); setFormation(1, "4-4-2");
 $("fh").onchange = e => { setFormation(0, e.target.value); draw(); };
 $("fa").onchange = e => { setFormation(1, e.target.value); draw(); };
 
-/* ---------- helpers ---------- */
-const snap = () => players.map(p => [p.x, p.y]);
+/* ---------- small helpers ---------- */
+const snap = () => players.map(p => [p.x, p.y]).concat([[ball.x, ball.y]]);
 const lerp = (a, b, t) => a + (b - a) * t;
 const ease = t => t * t * (3 - 2 * t);
 const col = t => t ? C.away : C.home;
 const tname = t => $("n" + t).value.trim() || (t ? "Away" : "Home");
-const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const rgb = hex => { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+const hexA = (hex, a) => { const [r, g, b] = rgb(hex); return `rgba(${r},${g},${b},${a})`; };
+const lum = hex => { const [r, g, b] = rgb(hex); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; };
+const shade = (hex, k) => { const [r, g, b] = rgb(hex), f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return `rgb(${f(r)},${f(g)},${f(b)})`; };
 const dseg = (px, py, a, b) => {
   const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy || 1;
   const t = Math.max(0, Math.min(1, ((px - a[0]) * dx + (py - a[1]) * dy) / l2));
   return Math.hypot(px - (a[0] + t * dx), py - (a[1] + t * dy));
 };
+function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
 
+function ballPos() {
+  if (track) return null;
+  if (playing && frames.length > 1 && frames[0].length > 22) {
+    const i = Math.max(0, Math.min(frames.length - 2, Math.floor(u))), t = ease(Math.max(0, Math.min(1, u - i)));
+    return { x: lerp(frames[i][22][0], frames[i + 1][22][0], t), y: lerp(frames[i][22][1], frames[i + 1][22][1], t) };
+  }
+  return ball;
+}
 function visible() {
   if (track) {
     const f = track.frames[Math.min(track.frames.length - 1, Math.round(u))];
@@ -284,42 +296,117 @@ function visible() {
   return on("showAway") ? list : list.filter(p => p.team === 0);
 }
 
-/* ---------- pitch ---------- */
-function resize() {
-  const dpr = window.devicePixelRatio || 1, w = cv.clientWidth;
-  if (!w) return;
-  scale = w / W;
-  cv.width = w * dpr; cv.height = H * scale * dpr;
-  cv.style.height = H * scale + "px";
-  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-  draw();
+/* ---------- camera: a real perspective projection of the pitch plane ---------- */
+let VW = 800, VH = 500, cam = { phi: 40, s: 1, ox: 0, oy: 0 }, camGoal = 40, camAnim = null;
+const VIEWS = { broadcast: 40, high: 56, top: 90 };
+const R = 100;
+function raw(x, y, z, phi) {                          // metres -> normalised camera plane (focal length 1)
+  const p = phi * Math.PI / 180, X = x - W / 2, Y = y - H / 2;
+  const cy = R * Math.cos(p), cz = R * Math.sin(p), dy = Y - cy, dz = z - cz;
+  const zc = dy * -Math.cos(p) + dz * -Math.sin(p), yc = dy * -Math.sin(p) + dz * Math.cos(p);
+  return [X / zc, -yc / zc, zc];
+}
+function fitCam(phi) {
+  const pts = [[0, 0], [W, 0], [W, H], [0, H]].map(([x, y]) => raw(x, y, 0, phi));
+  const xs = pts.map(q => q[0]), ys = pts.map(q => q[1]);
+  const bw = Math.max(...xs) - Math.min(...xs), bh = Math.max(...ys) - Math.min(...ys);
+  const top = phi > 75;
+  const s = Math.min(VW * (top ? .96 : .99) / bw, VH * (top ? .94 : .80) / bh);
+  const oy = top ? VH / 2 - s * (Math.min(...ys) + Math.max(...ys)) / 2 : VH - 36 - s * Math.max(...ys);
+  cam = { phi, s, ox: VW / 2 - s * (Math.min(...xs) + Math.max(...xs)) / 2, oy };
+}
+function P(x, y, z = 0) { const r = raw(x, y, z, cam.phi); return [cam.ox + cam.s * r[0], cam.oy + cam.s * r[1], cam.s / r[2]]; }
+
+function solve8(A, b) {                               // gaussian elimination for the homography
+  const n = 8; for (let i = 0; i < n; i++) A[i].push(b[i]);
+  for (let c = 0; c < n; c++) {
+    let m = c; for (let r = c + 1; r < n; r++) if (Math.abs(A[r][c]) > Math.abs(A[m][c])) m = r;
+    [A[c], A[m]] = [A[m], A[c]];
+    for (let r = 0; r < n; r++) if (r !== c) { const f = A[r][c] / A[c][c]; for (let k = c; k <= n; k++) A[r][k] -= f * A[c][k]; }
+  }
+  return A.map((row, i) => row[n] / row[i]);
+}
+function fit4(src, dst) {
+  const A = [], b = [];
+  for (let i = 0; i < 4; i++) {
+    const [x, y] = src[i], [X, Y] = dst[i];
+    A.push([x, y, 1, 0, 0, 0, -X * x, -X * y]); b.push(X);
+    A.push([0, 0, 0, x, y, 1, -Y * x, -Y * y]); b.push(Y);
+  }
+  const h = solve8(A, b); return [h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7], 1];
+}
+const inv3 = m => {
+  const [a, b, c, d, e, f, g, h, i] = m, A = e * i - f * h, B = -(d * i - f * g), Cc = d * h - e * g, det = a * A + b * B + c * Cc;
+  return [A, -(b * i - c * h), b * f - c * e, B, a * i - c * g, -(a * f - c * d), Cc, -(a * h - b * g), a * e - b * d].map(v => v / det);
+};
+const ap = (m, x, y) => { const w = m[6] * x + m[7] * y + m[8]; return [(m[0] * x + m[1] * y + m[2]) / w, (m[3] * x + m[4] * y + m[5]) / w]; };
+let Hg = null, Hgi = null;                            // ground canvas pixels <-> view pixels
+function applyCam() {
+  const GW = (W + 2 * M) * GPX, GH = (H + 2 * M) * GPX;
+  const corners = [[-M, -M], [W + M, -M], [W + M, H + M], [-M, H + M]].map(([x, y]) => P(x, y));
+  Hg = fit4([[0, 0], [GW, 0], [GW, GH], [0, GH]], corners); Hgi = inv3(Hg);
+  const h = Hg;
+  gc.style.transform = `matrix3d(${h[0]},${h[3]},0,${h[6]}, ${h[1]},${h[4]},0,${h[7]}, 0,0,1,0, ${h[2]},${h[5]},0,${h[8]})`;
+}
+const toMetres = (sx, sy) => { const [gx, gy] = ap(Hgi, sx, sy); return [gx / GPX - M, gy / GPX - M]; };
+window.toPage = (x, y) => { const r = viewEl.getBoundingClientRect(), q = P(x, y); return [r.left + q[0], r.top + q[1]]; };
+function setView(name, instant) {
+  camGoal = VIEWS[name];
+  document.querySelectorAll("#camBar button").forEach(b => b.classList.toggle("on", b.dataset.view === name));
+  if (instant) { camAnim = null; fitCam(camGoal); applyCam(); draw(false); return; }
+  const from = cam.phi, t0 = performance.now();
+  camAnim = ts => {
+    const k = Math.min(1, (ts - t0) / 700), e = k * k * (3 - 2 * k);
+    fitCam(lerp(from, camGoal, e)); applyCam(); draw(false);
+    if (k < 1) requestAnimationFrame(camAnim); else camAnim = null;
+  };
+  requestAnimationFrame(camAnim);
+}
+window.setView = setView;
+document.querySelectorAll("#camBar button").forEach(b => b.onclick = () => setView(b.dataset.view));
+function sizeAll() {
+  VW = viewEl.clientWidth; VH = viewEl.clientHeight; if (!VW) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  fgc.width = VW * dpr; fgc.height = VH * dpr; fx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const GW = (W + 2 * M) * GPX, GH = (H + 2 * M) * GPX;
+  if (gc.width !== GW) { gc.width = GW; gc.height = GH; gc.style.width = GW + "px"; gc.style.height = GH + "px"; }
+  fitCam(cam.phi); applyCam(); draw();
+}
+
+/* ---------- ground layer (pitch, overlays), drawn in metres ---------- */
+let noise = null;
+function grassNoise() {
+  const n = document.createElement("canvas"); n.width = n.height = 256; const c = n.getContext("2d"); let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 5200; i++) { c.fillStyle = rnd() > .5 ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.07)"; c.fillRect(rnd() * 256, rnd() * 256, 1 + rnd() * 2, 1 + rnd() * 4); }
+  return ctx.createPattern(n, "repeat");
 }
 function pitch() {
-  const n = 14;
-  for (let i = 0; i < n; i++) { ctx.fillStyle = i % 2 ? "#2f7a42" : "#2a6e3b"; ctx.fillRect(i * W / n, 0, W / n + .1, H); }
-  const g = ctx.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, W * .62);
-  g.addColorStop(0, "rgba(255,255,255,.07)"); g.addColorStop(1, "rgba(0,0,0,.34)");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = .2; ctx.fillStyle = "rgba(255,255,255,.9)";
-  ctx.strokeRect(.2, .2, W - .4, H - .4);
+  if (!noise) noise = grassNoise();
+  ctx.fillStyle = "#1d5530"; ctx.fillRect(-M, -M, W + 2 * M, H + 2 * M);
+  const n = 16;
+  for (let i = 0; i < n; i++) { ctx.fillStyle = i % 2 ? "#37893f" : "#2f7d39"; ctx.fillRect(i * W / n, 0, W / n + .05, H); }
+  ctx.save(); ctx.scale(1 / 3, 1 / 3); ctx.fillStyle = noise; ctx.fillRect(-M * 3, -M * 3, (W + 2 * M) * 3, (H + 2 * M) * 3); ctx.restore();
+  const g = ctx.createRadialGradient(W / 2, H / 2, 12, W / 2, H / 2, W * .72);
+  g.addColorStop(0, "rgba(255,255,255,.08)"); g.addColorStop(1, "rgba(0,12,4,.5)");
+  ctx.fillStyle = g; ctx.fillRect(-M, -M, W + 2 * M, H + 2 * M);
+  ctx.save(); ctx.shadowColor = "rgba(255,255,255,.6)"; ctx.shadowBlur = 3;
+  ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = .22; ctx.fillStyle = "rgba(255,255,255,.95)";
+  ctx.strokeRect(0, 0, W, H);
   ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
   ctx.beginPath(); ctx.arc(W / 2, H / 2, 9.15, 0, 7); ctx.stroke();
-  ctx.beginPath(); ctx.arc(W / 2, H / 2, .35, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(W / 2, H / 2, .4, 0, 7); ctx.fill();
   for (const s of [0, 1]) {
     const x = s ? W : 0, dir = s ? -1 : 1;
     ctx.strokeRect(s ? W - 16.5 : 0, (H - 40.32) / 2, 16.5, 40.32);
     ctx.strokeRect(s ? W - 5.5 : 0, (H - 18.32) / 2, 5.5, 18.32);
-    ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, .3, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, .35, 0, 7); ctx.fill();
     ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, 9.15, s ? Math.PI - .926 : -.926, s ? Math.PI + .926 : .926); ctx.stroke();
-    ctx.fillStyle = "rgba(255,255,255,.16)"; ctx.fillRect(s ? W - 1.6 : 0, (H - 7.32) / 2, 1.6, 7.32);
-    ctx.strokeRect(s ? W - 1.6 : 0, (H - 7.32) / 2, 1.6, 7.32); ctx.fillStyle = "rgba(255,255,255,.9)";
+    ctx.strokeRect(s ? W : -2.4, (H - 7.32) / 2, 2.4, 7.32);
   }
-  for (const [cx, cy, a] of [[0, 0, 0], [W, 0, Math.PI / 2], [W, H, Math.PI], [0, H, 1.5 * Math.PI]]) {
-    ctx.beginPath(); ctx.arc(cx, cy, 1, a, a + Math.PI / 2); ctx.stroke();
-  }
+  for (const [cx, cy, a] of [[0, 0, 0], [W, 0, Math.PI / 2], [W, H, Math.PI], [0, H, 1.5 * Math.PI]]) { ctx.beginPath(); ctx.arc(cx, cy, 1, a, a + Math.PI / 2); ctx.stroke(); }
+  ctx.restore();
 }
-
-/* ---------- geometry for analysis layers ---------- */
 function hull(pts) {
   const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
   if (p.length < 3) return p;
@@ -330,79 +417,80 @@ function hull(pts) {
   return lo.slice(0, -1).concat(up.slice(0, -1));
 }
 const outfield = (list, t) => list.filter(p => p.team === t).sort((a, b) => (t ? W - a.x : a.x) - (t ? W - b.x : b.x)).slice(1);
-
 function drawHulls(list) {
   for (const t of [0, 1]) {
-    const pts = outfield(list, t).map(p => [p.x, p.y]);
-    if (pts.length < 3) continue;
+    const pts = outfield(list, t).map(p => [p.x, p.y]); if (pts.length < 3) continue;
     const h = hull(pts);
     ctx.beginPath(); h.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath();
-    ctx.fillStyle = hexA(col(t), .16); ctx.fill();
-    ctx.strokeStyle = hexA(col(t), .85); ctx.lineWidth = .22; ctx.setLineDash([.9, .5]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = hexA(col(t), .2); ctx.fill();
+    ctx.strokeStyle = hexA(col(t), .9); ctx.lineWidth = .24; ctx.setLineDash([.9, .5]); ctx.stroke(); ctx.setLineDash([]);
   }
 }
 function drawLines(list) {
   for (const t of [0, 1]) {
-    const back = outfield(list, t).slice(0, 4).sort((a, b) => a.y - b.y);
-    if (back.length < 4) continue;
-    ctx.strokeStyle = hexA(col(t), .95); ctx.lineWidth = .5; ctx.lineCap = "round"; ctx.lineJoin = "round";
-    ctx.beginPath(); back.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke();
-    ctx.lineCap = "butt";
+    const back = outfield(list, t).slice(0, 4).sort((a, b) => a.y - b.y); if (back.length < 4) continue;
+    ctx.save(); ctx.shadowColor = col(t); ctx.shadowBlur = 8;
+    ctx.strokeStyle = hexA(col(t), .95); ctx.lineWidth = .6; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.beginPath(); back.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke(); ctx.restore();
   }
 }
 function drawOffside(list) {
   for (const t of [0, 1]) {
-    const own = list.filter(p => p.team === t).sort((a, b) => (t ? W - a.x : a.x) - (t ? W - b.x : b.x));
-    if (own.length < 2) continue;
+    const own = list.filter(p => p.team === t).sort((a, b) => (t ? W - a.x : a.x) - (t ? W - b.x : b.x)); if (own.length < 2) continue;
     const x = own[1].x;                                  // second-deepest player, goalkeeper included
-    ctx.strokeStyle = hexA(col(t), .95); ctx.lineWidth = .2; ctx.setLineDash([1.2, .8]);
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); ctx.setLineDash([]);
+    const g = ctx.createLinearGradient(x - 1.6, 0, x + 1.6, 0);
+    g.addColorStop(0, hexA(col(t), 0)); g.addColorStop(.5, hexA(col(t), .4)); g.addColorStop(1, hexA(col(t), 0));
+    ctx.fillStyle = g; ctx.fillRect(x - 1.6, 0, 3.2, H);
+    ctx.strokeStyle = hexA(col(t), .95); ctx.lineWidth = .25; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
   }
 }
 let space = [50, 50];
 function spaceControl(list, paint) {
-  const cell = 3, own = [0, 0];
+  const cell = 2.5, own = [0, 0];
   if (list.length < 2) { space = [50, 50]; return; }
   for (let x = cell / 2; x < W; x += cell) for (let y = cell / 2; y < H; y += cell) {
     let best = 1e9, bt = 0, second = 1e9;
-    for (const p of list) {
-      const d = Math.hypot(p.x - x, p.y - y);
-      if (d < best) { second = best; best = d; bt = p.team; } else if (d < second) second = d;
-    }
+    for (const p of list) { const d = Math.hypot(p.x - x, p.y - y); if (d < best) { second = best; best = d; bt = p.team; } else if (d < second) second = d; }
     own[bt]++;
-    if (paint) { ctx.fillStyle = hexA(col(bt), Math.min(.3, .08 + (second - best) * .02)); ctx.fillRect(x - cell / 2, y - cell / 2, cell + .05, cell + .05); }
+    if (paint) { ctx.fillStyle = hexA(col(bt), Math.min(.34, .07 + (second - best) * .022)); ctx.fillRect(x - cell / 2, y - cell / 2, cell + .05, cell + .05); }
   }
   const tot = own[0] + own[1]; space = [100 * own[0] / tot, 100 * own[1] / tot];
 }
 function drawTrails() {
   if (!track) return;
   const i = Math.min(track.frames.length - 1, Math.round(u)), back = 25;
-  const cur = track.frames[i].players;
-  for (const p of cur) {
+  for (const p of track.frames[i].players) {
     if (p.team && !on("showAway")) continue;
-    ctx.lineCap = "round";
-    let prev = [p.x, p.y];
+    ctx.lineCap = "round"; let prev = [p.x, p.y];
     for (let k = 1; k <= back && i - k >= 0; k++) {
-      const q = track.frames[i - k].players.find(z => z.id === p.id && z.team === p.team);
-      if (!q) break;
-      ctx.strokeStyle = hexA(col(p.team), .6 * (1 - k / back)); ctx.lineWidth = .45 * (1 - k / (back * 1.4));
+      const q = track.frames[i - k].players.find(z => z.id === p.id && z.team === p.team); if (!q) break;
+      ctx.strokeStyle = hexA(col(p.team), .7 * (1 - k / back)); ctx.lineWidth = .55 * (1 - k / (back * 1.4));
       ctx.beginPath(); ctx.moveTo(prev[0], prev[1]); ctx.lineTo(q.x, q.y); ctx.stroke(); prev = [q.x, q.y];
     }
   }
   ctx.lineCap = "butt";
 }
-
-/* ---------- keyframe runs and plan ghosts ---------- */
+function arrow(a, b, color, o = {}) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]); if (len < .5) return;
+  const nx = -(b[1] - a[1]) / len, ny = (b[0] - a[0]) / len, bend = o.curve ? len * .16 : 0;
+  const c = [(a[0] + b[0]) / 2 + nx * bend, (a[1] + b[1]) / 2 + ny * bend];
+  ctx.save(); ctx.globalAlpha = o.alpha ?? 1; ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = o.w || .35; ctx.lineCap = "round";
+  ctx.shadowColor = color; ctx.shadowBlur = 6;
+  if (o.dash) ctx.setLineDash([.9, .6]);
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(c[0], c[1], b[0], b[1]); ctx.stroke(); ctx.setLineDash([]);
+  const ang = Math.atan2(b[1] - c[1], b[0] - c[0]), hs = o.head || 1.8;
+  ctx.beginPath(); ctx.moveTo(b[0], b[1]);
+  ctx.lineTo(b[0] - hs * Math.cos(ang - .42), b[1] - hs * Math.sin(ang - .42));
+  ctx.lineTo(b[0] - hs * Math.cos(ang + .42), b[1] - hs * Math.sin(ang + .42)); ctx.closePath(); ctx.fill(); ctx.restore();
+}
 function runs() {
   if (track || !on("showRuns") || frames.length < 2) return;
-  ctx.lineWidth = .2;
   for (let i = 0; i < frames.length - 1; i++) players.forEach((p, k) => {
     if (p.team && !on("showAway")) return;
     const [x0, y0] = frames[i][k], [x1, y1] = frames[i + 1][k];
     if (Math.hypot(x1 - x0, y1 - y0) < 1) return;
-    arrow([x0, y0], [x1, y1], col(p.team), { dash: true, alpha: .8 });
+    arrow([x0, y0], [x1, y1], col(p.team), { dash: true, alpha: .85, w: .28 });
   });
-  ctx.setLineDash([]); ctx.globalAlpha = 1;
 }
 const planOffset = () => parseFloat($("planOff").value) || 0;
 function planAt(tp) {
@@ -413,143 +501,193 @@ function planAt(tp) {
   for (const f of plan.frames) { const d = Math.abs(f.t - tp); if (d < bd) { bd = d; best = f; } }
   return best;
 }
-function planFrame() {
-  if (!track || !plan) return null;
-  return planAt(track.frames[Math.min(track.frames.length - 1, Math.round(u))].t - planOffset());
-}
+function planFrame() { return !track || !plan ? null : planAt(track.frames[Math.min(track.frames.length - 1, Math.round(u))].t - planOffset()); }
 function ghosts() {
   const pf = planFrame(); if (!pf) return;
-  ctx.setLineDash([.6, .5]); ctx.lineWidth = .22; ctx.globalAlpha = .95;
+  ctx.setLineDash([.6, .5]); ctx.lineWidth = .28;
   for (const p of pf.players) {
     if (p.team && !on("showAway")) continue;
-    ctx.strokeStyle = col(p.team);
-    ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, 7); ctx.stroke();
+    ctx.strokeStyle = col(p.team); ctx.fillStyle = hexA(col(p.team), .1);
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2.3, 0, 7); ctx.fill(); ctx.stroke();
   }
-  ctx.setLineDash([]); ctx.globalAlpha = 1;
-}
-
-/* ---------- annotations ---------- */
-function arrow(a, b, color, o = {}) {
-  const len = Math.hypot(b[0] - a[0], b[1] - a[1]); if (len < .5) return;
-  const nx = -(b[1] - a[1]) / len, ny = (b[0] - a[0]) / len, bend = o.curve ? len * .16 : 0;
-  const c = [(a[0] + b[0]) / 2 + nx * bend, (a[1] + b[1]) / 2 + ny * bend];
-  ctx.save();
-  ctx.globalAlpha = o.alpha ?? 1; ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = o.w || .3; ctx.lineCap = "round";
-  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = .8 * scale / 6;
-  if (o.dash) ctx.setLineDash([.8, .6]);
-  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(c[0], c[1], b[0], b[1]); ctx.stroke();
   ctx.setLineDash([]);
-  const ang = Math.atan2(b[1] - c[1], b[0] - c[0]), hs = o.head || 1.5;
-  ctx.beginPath(); ctx.moveTo(b[0], b[1]);
-  ctx.lineTo(b[0] - hs * Math.cos(ang - .45), b[1] - hs * Math.sin(ang - .45));
-  ctx.lineTo(b[0] - hs * Math.cos(ang + .45), b[1] - hs * Math.sin(ang + .45)); ctx.closePath(); ctx.fill();
-  ctx.restore();
 }
-function drawAnn(a, list, layer) {
-  if (a.type === "spot") {
-    if (layer !== "under") return;
-    const p = list.find(q => q.team === a.team && q.num === a.num); if (!p) return;
-    const g = ctx.createLinearGradient(p.x, p.y - 14, p.x, p.y);
-    g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(255,255,255,.38)");
-    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(p.x - 1.2, p.y - 14); ctx.lineTo(p.x + 1.2, p.y - 14); ctx.lineTo(p.x + 3.6, p.y); ctx.lineTo(p.x - 3.6, p.y); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = "#fff"; ctx.lineWidth = .3; ctx.fillStyle = "rgba(255,255,255,.18)";
-    ctx.beginPath(); ctx.ellipse(p.x, p.y + .5, 3.8, 2.3, 0, 0, 7); ctx.fill(); ctx.stroke();
-  } else if (a.type === "zone") {
-    if (layer !== "under") return;
-    ctx.fillStyle = hexA(a.color, .22); ctx.strokeStyle = a.color; ctx.lineWidth = .3; ctx.setLineDash([1, .6]);
+function drawGroundAnn(a, list) {
+  if (a.type === "zone") {
+    ctx.fillStyle = hexA(a.color, .24); ctx.strokeStyle = a.color; ctx.lineWidth = .35; ctx.setLineDash([1, .6]);
     ctx.beginPath(); ctx.ellipse(a.c[0], a.c[1], Math.max(.8, a.r[0]), Math.max(.8, a.r[1]), 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
-  } else if (layer === "over") {
-    if (a.type === "run") arrow(a.a, a.b, a.color, { curve: true, dash: true });
-    else if (a.type === "pass") {
-      arrow(a.a, a.b, a.color, { w: .35 });
-      ctx.fillStyle = a.color; ctx.beginPath(); ctx.arc(a.a[0], a.a[1], .7, 0, 7); ctx.fill();
-    } else if (a.type === "text") {
-      ctx.font = "700 2px " + getComputedStyle(document.body).fontFamily; ctx.textAlign = "left"; ctx.textBaseline = "middle";
-      const w = ctx.measureText(a.s).width + 1.6;
-      ctx.fillStyle = "rgba(8,12,22,.82)"; roundRect(a.x - .4, a.y - 1.5, w, 3, .8); ctx.fill();
-      ctx.fillStyle = a.color; ctx.fillRect(a.x - .4, a.y - 1.5, .35, 3);
-      ctx.fillStyle = "#fff"; ctx.fillText(a.s, a.x + .6, a.y + .1);
-    }
-  }
+  } else if (a.type === "spot") {
+    const p = list.find(q => q.team === a.team && q.num === a.num); if (!p) return;
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = .35; ctx.fillStyle = "rgba(255,255,255,.2)";
+    ctx.save(); ctx.shadowColor = "#fff"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.arc(p.x, p.y, 3.4, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore();
+  } else if (a.type === "run") arrow(a.a, a.b, a.color, { curve: true, dash: true });
+  else if (a.type === "pass") { arrow(a.a, a.b, a.color, { w: .45 }); ctx.fillStyle = a.color; ctx.beginPath(); ctx.arc(a.a[0], a.a[1], .8, 0, 7); ctx.fill(); }
 }
-function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 function previewAnn() {
   if (!gesture) return;
-  const col = $("annCol").value, { a, b } = gesture;
-  if (tool === "run") drawAnn({ type: "run", a, b, color: col }, [], "over");
-  if (tool === "pass") drawAnn({ type: "pass", a, b, color: col }, [], "over");
-  if (tool === "zone") drawAnn({ type: "zone", c: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], r: [Math.abs(b[0] - a[0]) / 2, Math.abs(b[1] - a[1]) / 2], color: col }, [], "under");
+  const color = $("annCol").value, { a, b } = gesture;
+  if (tool === "run" || tool === "pass") drawGroundAnn({ type: tool, a, b, color }, []);
+  if (tool === "zone") drawGroundAnn({ type: "zone", c: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], r: [Math.abs(b[0] - a[0]) / 2, Math.abs(b[1] - a[1]) / 2], color }, []);
 }
-
-/* ---------- broadcast graphics inside the canvas ---------- */
-function lowerThird() {
-  const f = ["fh", "fa"].map(id => $(id).value), fam = getComputedStyle(document.body).fontFamily;
-  ctx.save(); ctx.textBaseline = "middle"; ctx.textAlign = "left";
-  let y = 2.2;
-  for (const t of [0, 1]) {
-    if (t && !on("showAway")) continue;
-    const label = tname(t).toUpperCase(), sub = track ? "TRACKED" : f[t];
-    ctx.font = "800 1.8px " + fam; const lw = ctx.measureText(label).width;
-    ctx.font = "600 1.4px " + fam; const w = lw + ctx.measureText(sub).width + 6.5; ctx.font = "800 1.8px " + fam;
-    ctx.fillStyle = "rgba(6,10,20,.84)"; roundRect(2, y, w, 3.2, .5); ctx.fill();
-    ctx.fillStyle = col(t); ctx.fillRect(2, y, .9, 3.2);
-    ctx.fillStyle = "#fff"; ctx.fillText(label, 4, y + 1.65);
-    ctx.font = "600 1.4px " + fam; ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.textAlign = "right"; ctx.fillText(sub, 2 + w - 1, y + 1.65); ctx.textAlign = "left";
-    y += 3.8;
-  }
-  const tag = track ? "REPLAY" : (playing ? "PLAN" : "BOARD");
-  ctx.font = "800 1.5px " + fam; const tw = ctx.measureText(tag).width + 3;
-  ctx.fillStyle = "rgba(6,10,20,.84)"; roundRect(W - tw - 2, 2.2, tw, 3, .5); ctx.fill();
-  ctx.fillStyle = track ? "#22d3a6" : "#38bdf8"; ctx.fillText(tag, W - tw - .5, 3.75);
-  ctx.restore();
-}
-
-/* ---------- draw ---------- */
-function drawPlayer(p) {
-  const r = 1.7, c = col(p.team);
-  ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = scale * .25; ctx.shadowOffsetY = scale * .06;
-  const g = ctx.createRadialGradient(p.x - .5, p.y - .6, .2, p.x, p.y, r);
-  g.addColorStop(0, hexA(c, 1)); g.addColorStop(1, shade(c, -.28));
-  ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.fillStyle = g; ctx.fill();
-  ctx.shadowColor = "transparent"; ctx.lineWidth = .28; ctx.strokeStyle = "rgba(255,255,255,.92)"; ctx.stroke();
-  ctx.restore();
-  ctx.fillStyle = lum(c) > .55 ? "#0b1220" : "#fff"; ctx.font = "800 1.75px " + getComputedStyle(document.body).fontFamily;
-  ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(p.num, p.x, p.y + .1);
-  const nm = on("showNames") && !track && names[p.team][p.num - 1];
-  if (nm) {
-    ctx.font = "700 1.4px " + getComputedStyle(document.body).fontFamily;
-    const w = ctx.measureText(nm).width + 1.2;
-    ctx.fillStyle = "rgba(6,10,20,.8)"; roundRect(p.x - w / 2, p.y + 2.1, w, 2.1, .5); ctx.fill();
-    ctx.fillStyle = "#fff"; ctx.fillText(nm, p.x, p.y + 3.2);
-  }
-}
-function lum(hex) { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; }
-function shade(hex, k) { const n = parseInt(hex.slice(1), 16), f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`; }
-function drawBall() {
-  if (track) return;
-  ctx.save(); ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = scale * .2;
-  ctx.beginPath(); ctx.arc(ball.x, ball.y, .85, 0, 7); ctx.fillStyle = "#fff"; ctx.fill();
-  ctx.shadowColor = "transparent"; ctx.lineWidth = .15; ctx.strokeStyle = "#111"; ctx.stroke();
-  ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(ball.x, ball.y, .32, 0, 7); ctx.fill(); ctx.restore();
-}
-function draw() {
-  if (!scale) return;
-  ctx.clearRect(0, 0, W, H); pitch();
-  const list = visible();
+function drawGround(list) {
+  ctx.setTransform(GPX, 0, 0, GPX, M * GPX, M * GPX);
+  pitch();
   spaceControl(list, on("showSpace"));
   if (on("showHull")) drawHulls(list);
   if (on("showTrails")) drawTrails();
   runs(); ghosts();
   if (on("showOff")) drawOffside(list);
   if (on("showLines")) drawLines(list);
-  for (const a of ann) drawAnn(a, list, "under");
+  for (const a of ann) drawGroundAnn(a, list);
   previewAnn();
-  for (const p of list) drawPlayer(p);
-  drawBall();
-  for (const a of ann) drawAnn(a, list, "over");
-  lowerThird();
-  metrics(list);
+}
+
+/* ---------- screen layer: stadium, standing players, ball, tags, graphics ---------- */
+let crowd = null;
+function buildCrowd() {
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pal = ["#d9453d", "#e9e9f2", "#3b6fd9", "#f2c14e", "#2a2f45", "#d9453d", "#e9e9f2"];
+  crowd = Array.from({ length: 4200 }, () => ({ x: -30 + rnd() * (W + 60), z: rnd(), c: pal[Math.floor(rnd() * pal.length)], o: .35 + rnd() * .5 }));
+}
+function drawStadium() {
+  if (cam.phi > 70) return;
+  if (!crowd) buildCrowd();
+  const yb = -M + 2.2;                                  // advertising boards along the far touchline
+  const sp = (x, z) => P(x, yb - z * .85, 1 + z);       // stand: rises away from the pitch
+  const ZT = 60, a = sp(-50, 0), b = sp(W + 50, 0), c = sp(W + 50, ZT), d = sp(-50, ZT);
+  const g = fx.createLinearGradient(0, d[1], 0, a[1]); g.addColorStop(0, "#080b16"); g.addColorStop(1, "#18203a");
+  fx.fillStyle = g; fx.beginPath(); fx.moveTo(a[0], a[1]); fx.lineTo(b[0], b[1]); fx.lineTo(c[0], c[1]); fx.lineTo(d[0], d[1]); fx.closePath(); fx.fill();
+  for (const q of crowd) {
+    const z = q.z * ZT, p = sp(q.x * 1.45 - 15, z), r = Math.max(.8, p[2] * .24);
+    fx.globalAlpha = q.o * (1 - z / (ZT * 1.4)); fx.fillStyle = q.c; fx.fillRect(p[0], p[1], r * 1.1, r * 1.4);
+  }
+  fx.globalAlpha = 1;
+  const x0 = -M + 1, x1 = W + M - 1, n = 9, bw = (x1 - x0) / n;
+  for (let i = 0; i < n; i++) {
+    const p0 = P(x0 + i * bw, yb, 0), p1 = P(x0 + (i + 1) * bw, yb, 0), p2 = P(x0 + (i + 1) * bw, yb, 1.1), p3 = P(x0 + i * bw, yb, 1.1);
+    const gg = fx.createLinearGradient(0, p3[1], 0, p0[1]); gg.addColorStop(0, i % 2 ? "#0b3f66" : "#122a52"); gg.addColorStop(1, i % 2 ? "#1585c9" : "#1f4fa3");
+    fx.fillStyle = gg; fx.beginPath(); fx.moveTo(p0[0], p0[1]); fx.lineTo(p1[0], p1[1]); fx.lineTo(p2[0], p2[1]); fx.lineTo(p3[0], p3[1]); fx.closePath(); fx.fill();
+    fx.fillStyle = "rgba(255,255,255,.85)"; const m = P(x0 + (i + .5) * bw, yb, .55); fx.fillRect(m[0] - p0[2] * bw * .22, m[1] - p0[2] * .12, p0[2] * bw * .44, Math.max(1, p0[2] * .22));
+  }
+  const gl = fx.createLinearGradient(0, 0, 0, VH * .5); gl.addColorStop(0, "rgba(0,0,0,.35)"); gl.addColorStop(1, "rgba(0,0,0,0)");
+  fx.fillStyle = gl; fx.fillRect(0, 0, VW, VH * .5);
+}
+const SKIN = ["#f0c8a0", "#e0ac84", "#c68a62", "#8d5a3a", "#5e3b26"];
+function drawFigure(p, gk) {
+  const [x, y, k] = P(p.x, p.y), c = gk ? (p.team ? "#ff8a3d" : "#2fd47b") : col(p.team), dark = shade(c, -.45), mid = shade(c, -.2);
+  const m = k * 2.4;                                    // stylised figure scale, as in TV graphics
+  const fl = Math.sin(cam.phi * Math.PI / 180);
+  fx.save(); fx.translate(x, y); fx.scale(1, Math.max(.3, fl));
+  fx.beginPath(); fx.arc(0, 0, m * .62, 0, 7); fx.fillStyle = "rgba(0,0,0,.35)"; fx.fill();
+  fx.beginPath(); fx.arc(0, 0, m * .5, 0, 7); fx.strokeStyle = hexA(c, .95); fx.lineWidth = Math.max(1.2, m * .08); fx.shadowColor = c; fx.shadowBlur = 8; fx.stroke();
+  fx.restore();
+  const lh = m * .52, sh = m * .26, th = m * .5, bw = m * .46, headR = m * .17;
+  const yFeet = y, yHip = y - lh, yShoulder = yHip - sh - th;
+  fx.lineCap = "round";
+  for (const s of [-1, 1]) {
+    fx.strokeStyle = lum(c) > .6 ? "#dfe6f2" : mid; fx.lineWidth = m * .12;
+    fx.beginPath(); fx.moveTo(x + s * m * .1, yHip); fx.lineTo(x + s * m * .13, yFeet - m * .03); fx.stroke();
+    fx.strokeStyle = "#0b0e14"; fx.lineWidth = m * .14; fx.beginPath(); fx.moveTo(x + s * m * .13, yFeet - m * .04); fx.lineTo(x + s * m * .16, yFeet); fx.stroke();
+  }
+  fx.fillStyle = dark; rr(fx, x - bw * .46, yHip - sh, bw * .92, sh + m * .04, m * .06); fx.fill();
+  for (const s of [-1, 1]) {
+    fx.strokeStyle = shade(c, -.1); fx.lineWidth = m * .13; fx.beginPath(); fx.moveTo(x + s * bw * .52, yShoulder + m * .06); fx.lineTo(x + s * bw * .66, yShoulder + th * .62); fx.stroke();
+    fx.strokeStyle = SKIN[(p.num + p.team) % 5]; fx.lineWidth = m * .1; fx.beginPath(); fx.moveTo(x + s * bw * .66, yShoulder + th * .62); fx.lineTo(x + s * bw * .7, yShoulder + th * .86); fx.stroke();
+  }
+  const tg = fx.createLinearGradient(x - bw / 2, 0, x + bw / 2, 0); tg.addColorStop(0, shade(c, -.25)); tg.addColorStop(.45, c); tg.addColorStop(1, shade(c, -.32));
+  fx.fillStyle = tg; rr(fx, x - bw / 2, yShoulder, bw, th + m * .02, m * .14); fx.fill();
+  fx.strokeStyle = "rgba(255,255,255,.35)"; fx.lineWidth = Math.max(.6, m * .02); fx.stroke();
+  fx.fillStyle = SKIN[(p.num * 3 + p.team) % 5]; fx.beginPath(); fx.arc(x, yShoulder - headR * .85, headR, 0, 7); fx.fill();
+  fx.fillStyle = ["#1a1410", "#3a2616", "#7a5a2c", "#1a1410"][(p.num + p.team * 2) % 4]; fx.beginPath(); fx.arc(x, yShoulder - headR * 1.05, headR * 1.02, Math.PI * 1.02, Math.PI * 1.98); fx.fill();
+  if (m > 11) { fx.fillStyle = lum(c) > .55 ? "#0b1220" : "#fff"; fx.font = `800 ${Math.max(8, m * .3)}px ${FONT}`; fx.textAlign = "center"; fx.textBaseline = "middle"; fx.fillText(p.num, x, yShoulder + th * .42); }
+  return { x, topY: yShoulder - headR * 2.2, y: yFeet };
+}
+function tag(p, pos) {
+  const nm = on("showNames") && !track && names[p.team][p.num - 1]; if (!nm) return;
+  fx.font = `700 11px ${FONT}`; const w = fx.measureText(nm).width + 12, h = 17;
+  fx.fillStyle = "rgba(5,9,20,.88)"; rr(fx, pos.x - w / 2, pos.topY - h - 4, w, h, 5); fx.fill();
+  fx.fillStyle = col(p.team); fx.fillRect(pos.x - w / 2, pos.topY - h - 4, 3, h);
+  fx.fillStyle = "#fff"; fx.textAlign = "center"; fx.textBaseline = "middle"; fx.fillText(nm, pos.x + 1, pos.topY - h / 2 - 4);
+}
+function drawDisc(p, gk) {
+  const [x, y, k] = P(p.x, p.y), r = 1.9 * k, c = gk ? (p.team ? "#ff8a3d" : "#2fd47b") : col(p.team);
+  fx.save(); fx.shadowColor = "rgba(0,0,0,.6)"; fx.shadowBlur = 8; fx.shadowOffsetY = 2;
+  const g = fx.createRadialGradient(x - r * .3, y - r * .35, r * .1, x, y, r); g.addColorStop(0, c); g.addColorStop(1, shade(c, -.32));
+  fx.beginPath(); fx.arc(x, y, r, 0, 7); fx.fillStyle = g; fx.fill(); fx.shadowColor = "transparent";
+  fx.lineWidth = Math.max(1.4, r * .13); fx.strokeStyle = "rgba(255,255,255,.95)"; fx.stroke(); fx.restore();
+  fx.fillStyle = lum(c) > .55 ? "#0b1220" : "#fff"; fx.font = `800 ${r * 1.05}px ${FONT}`; fx.textAlign = "center"; fx.textBaseline = "middle"; fx.fillText(p.num, x, y + r * .05);
+  const nm = on("showNames") && !track && names[p.team][p.num - 1];
+  if (nm) { fx.font = `700 11px ${FONT}`; const w = fx.measureText(nm).width + 10; fx.fillStyle = "rgba(5,9,20,.88)"; rr(fx, x - w / 2, y + r + 3, w, 16, 5); fx.fill(); fx.fillStyle = "#fff"; fx.fillText(nm, x, y + r + 11.5); }
+  return { x, topY: y - r, y: y + r };
+}
+function drawBallFg() {
+  const b = ballPos(); if (!b) return;
+  const [x, y, k] = P(b.x, b.y, 0), r = Math.max(4, k * .55);
+  fx.fillStyle = "rgba(0,0,0,.4)"; fx.beginPath(); fx.ellipse(x + r * .2, y, r * 1.1, r * .45, 0, 0, 7); fx.fill();
+  const g = fx.createRadialGradient(x - r * .3, y - r * 1.6, r * .1, x, y - r, r); g.addColorStop(0, "#fff"); g.addColorStop(1, "#b9c0cc");
+  fx.fillStyle = g; fx.beginPath(); fx.arc(x, y - r, r, 0, 7); fx.fill();
+  fx.fillStyle = "#1a1d26"; for (const [dx, dy] of [[0, 0], [-.55, -.2], [.55, -.2], [-.3, .5], [.3, .5]]) { fx.beginPath(); fx.arc(x + dx * r, y - r + dy * r, r * .26, 0, 7); fx.fill(); }
+}
+function drawSpotCones(list) {
+  for (const a of ann) if (a.type === "spot") {
+    const p = list.find(q => q.team === a.team && q.num === a.num); if (!p) continue;
+    const base = P(p.x, p.y, 0), top = P(p.x, p.y, 16), wBase = base[2] * 3.4, wTop = base[2] * .9;
+    const g = fx.createLinearGradient(0, top[1], 0, base[1]); g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(255,255,255,.42)");
+    fx.fillStyle = g; fx.beginPath(); fx.moveTo(top[0] - wTop, top[1]); fx.lineTo(top[0] + wTop, top[1]); fx.lineTo(base[0] + wBase, base[1]); fx.lineTo(base[0] - wBase, base[1]); fx.closePath(); fx.fill();
+  }
+}
+function drawTextAnn() {
+  for (const a of ann) if (a.type === "text") {
+    const [x, y] = P(a.x, a.y, 0);
+    fx.font = `700 13px ${FONT}`; const w = fx.measureText(a.s).width + 16;
+    fx.strokeStyle = a.color; fx.lineWidth = 1.5; fx.beginPath(); fx.moveTo(x, y); fx.lineTo(x, y - 18); fx.stroke();
+    fx.fillStyle = a.color; fx.beginPath(); fx.arc(x, y, 3, 0, 7); fx.fill();
+    fx.fillStyle = "rgba(5,9,20,.9)"; rr(fx, x - 2, y - 40, w, 22, 6); fx.fill(); fx.fillStyle = a.color; fx.fillRect(x - 2, y - 40, 3.5, 22);
+    fx.fillStyle = "#fff"; fx.textAlign = "left"; fx.textBaseline = "middle"; fx.fillText(a.s, x + 8, y - 28.5);
+  }
+}
+function lowerThird() {
+  const f = ["fh", "fa"].map(id => $(id).value); let y = 14;
+  fx.textBaseline = "middle";
+  for (const t of [0, 1]) {
+    if (t && !on("showAway")) continue;
+    const label = tname(t).toUpperCase(), sub = track ? "TRACKED" : f[t];
+    fx.font = `800 15px ${FONT}`; const lw = fx.measureText(label).width;
+    fx.font = `600 11px ${FONT}`; const w = lw + fx.measureText(sub).width + 44;
+    fx.fillStyle = "rgba(5,9,20,.88)"; rr(fx, 14, y, w, 30, 6); fx.fill();
+    fx.fillStyle = col(t); fx.fillRect(14, y, 6, 30);
+    fx.fillStyle = "#fff"; fx.font = `800 15px ${FONT}`; fx.textAlign = "left"; fx.fillText(label, 30, y + 15.5);
+    fx.font = `600 11px ${FONT}`; fx.fillStyle = "rgba(255,255,255,.6)"; fx.textAlign = "right"; fx.fillText(sub, 14 + w - 10, y + 15.5);
+    y += 36;
+  }
+  const tagT = track ? "REPLAY" : (playing ? "PLAN" : "BOARD");
+  fx.font = `800 11px ${FONT}`; const tw = fx.measureText(tagT).width + 22, rx = VW - 14 - ($("camBar").offsetWidth + 10) - tw;
+  fx.fillStyle = "rgba(5,9,20,.88)"; rr(fx, rx, 14, tw, 26, 6); fx.fill();
+  fx.fillStyle = track ? "#22d3a6" : "#3ec1ff"; fx.textAlign = "center"; fx.fillText(tagT, rx + tw / 2, 27.5);
+}
+
+/* ---------- draw ---------- */
+let figBoxes = [];
+function draw(ground = true) {
+  if (!Hg) return;
+  const list = visible();
+  if (ground) { ctx.setTransform(1, 0, 0, 1, 0, 0); drawGround(list); metrics(list); }
+  fx.clearRect(0, 0, VW, VH);
+  drawStadium();
+  drawSpotCones(list);
+  const items = list.map(p => ({ p, y: p.y })); const b = ballPos();
+  if (b) items.push({ ball: true, y: b.y - 0.01 });
+  items.sort((a, c) => a.y - c.y);
+  figBoxes = [];
+  const gk = new Set();
+  for (const t of [0, 1]) { const own = list.filter(p => p.team === t); if (own.length) gk.add(own.reduce((a, c) => (t ? W - c.x : c.x) < (t ? W - a.x : a.x) ? c : a)); }
+  const fig = cam.phi < 72;
+  for (const it of items) {
+    if (it.ball) { drawBallFg(); continue; }
+    const pos = fig ? drawFigure(it.p, gk.has(it.p) && !track) : drawDisc(it.p, gk.has(it.p) && !track);
+    figBoxes.push({ p: it.p, ...pos }); tag(it.p, pos);
+  }
+  drawTextAnn(); lowerThird();
 }
 
 /* ---------- team shape metrics ---------- */
@@ -575,15 +713,13 @@ function metrics(list) {
   planPanel(list);
 }
 function planPanel(list) {
-  const box = $("pvaBox"); box.hidden = !(track && plan);
-  $("momCard").hidden = box.hidden;
+  const box = $("pvaBox"); box.hidden = !(track && plan); $("momCard").hidden = box.hidden;
   if (box.hidden) return;
   const pf = planFrame(), note = $("pvaNote");
   for (const t of [0, 1]) {
     const a = shape(list, t), b = pf ? shape(pf.players, t) : null;
     for (const [id, k] of [["pw", "w"], ["pd", "d"], ["pl", "l"]]) {
-      const d = a && b ? a[k] - b[k] : null;
-      $(id + t).textContent = d === null ? "-" : (d > 0 ? "+" : "") + d.toFixed(1);
+      const d = a && b ? a[k] - b[k] : null; $(id + t).textContent = d === null ? "-" : (d > 0 ? "+" : "") + d.toFixed(1);
     }
   }
   note.textContent = pf ? "Dashed rings show where the plan had each player." : "The plan has no frame at this time. Change \"Plan starts at\" to line it up.";
@@ -596,14 +732,10 @@ function computeMoments() {
     const thr = parseFloat($("thr").value) || 5, minDur = 2;
     for (const t of [0, 1]) {
       let run = null;
-      const close = () => {
-        if (run && run.e - run.s >= minDur) moments.push({ ...run, team: t, avg: run.sum / run.n });
-        run = null;
-      };
+      const close = () => { if (run && run.e - run.s >= minDur) moments.push({ ...run, team: t, avg: run.sum / run.n }); run = null; };
       track.frames.forEach((f, i) => {
         const pf = planAt(f.t - planOffset());
-        const a = pf && shape(f.players, t), b = pf && shape(pf.players, t);
-        const d = a && b ? a.l - b.l : null;
+        const a = pf && shape(f.players, t), b = pf && shape(pf.players, t), d = a && b ? a.l - b.l : null;
         if (d !== null && Math.abs(d) >= thr) {
           if (!run) run = { s: f.t, i, sum: 0, n: 0, peak: 0 };
           run.e = f.t; run.sum += d; run.n++; if (Math.abs(d) > Math.abs(run.peak)) run.peak = d;
@@ -623,75 +755,82 @@ function computeMoments() {
     li.append(b); ul.append(li);
   });
   const marks = $("marks"); marks.innerHTML = "";
-  if (track) moments.forEach(m => {
-    const i = document.createElement("i"); i.style.left = (m.i / Math.max(1, track.frames.length - 1) * 100) + "%"; marks.append(i);
-  });
+  if (track) moments.forEach(m => { const i = document.createElement("i"); i.style.left = (m.i / Math.max(1, track.frames.length - 1) * 100) + "%"; marks.append(i); });
 }
 
 /* ---------- pointer: move players, draw annotations ---------- */
-const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / scale, (e.clientY - r.top) / scale]; };
+const ptr = e => { const r = viewEl.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+const gnd = e => { const [sx, sy] = ptr(e); return toMetres(sx, sy); };
 const clampP = ([x, y]) => [Math.max(0, Math.min(W, x)), Math.max(0, Math.min(H, y))];
-cv.addEventListener("pointerdown", e => {
-  const [x, y] = pos(e);
+function hitPlayer(sx, sy, pool) {                      // pick the figure under the pointer (body or feet)
+  let best = null, bd = 1e9;
+  for (const b of figBoxes) {
+    if (pool && !pool(b.p)) continue;
+    const halfW = Math.max(12, (b.y - b.topY) * .34), inside = Math.abs(sx - b.x) < halfW && sy > b.topY - 4 && sy < b.y + 8;
+    const d = Math.hypot(sx - b.x, sy - (b.y + b.topY) / 2); if (inside && d < bd) { bd = d; best = b.p; }
+  }
+  return best;
+}
+fgc.addEventListener("pointerdown", e => {
+  const [sx, sy] = ptr(e), [x, y] = toMetres(sx, sy);
   if (tool === "move") {
     if (track || playing) return;
-    if (Math.hypot(ball.x - x, ball.y - y) < 1.8) drag = ball;
-    else drag = players.filter(p => p.team === 0 || on("showAway")).find(p => Math.hypot(p.x - x, p.y - y) < 2.2) || null;
-    if (drag) cv.setPointerCapture(e.pointerId);
+    const bp = P(ball.x, ball.y, 0);
+    if (Math.hypot(sx - bp[0], sy - bp[1] + 6) < Math.max(12, bp[2] * 1.2)) { drag = ball; dragOff = [ball.x - x, ball.y - y]; }
+    else {
+      const hit = hitPlayer(sx, sy, p => p.team === 0 || on("showAway"));
+      drag = hit ? players[hit.team * 11 + hit.num - 1] : null;
+      if (drag) dragOff = [drag.x - x, drag.y - y];
+    }
+    if (drag) fgc.setPointerCapture(e.pointerId);
     return;
   }
   if (tool === "erase") { eraseAt(x, y); return; }
   if (tool === "spot") {
-    const p = visible().map(q => ({ q, d: Math.hypot(q.x - x, q.y - y) })).sort((a, b) => a.d - b.d)[0];
-    if (p && p.d < 3) {
-      const i = ann.findIndex(a => a.type === "spot" && a.team === p.q.team && a.num === p.q.num);
-      if (i >= 0) ann.splice(i, 1); else ann.push({ type: "spot", team: p.q.team, num: p.q.num });
+    const p = hitPlayer(sx, sy);
+    if (p) {
+      const i = ann.findIndex(a => a.type === "spot" && a.team === p.team && a.num === p.num);
+      if (i >= 0) ann.splice(i, 1); else ann.push({ type: "spot", team: p.team, num: p.num });
       draw();
     }
     return;
   }
-  if (tool === "text") { openText(x, y); return; }
-  gesture = { a: clampP([x, y]), b: clampP([x, y]) };
-  cv.setPointerCapture(e.pointerId);
+  if (tool === "text") { openText(sx, sy, x, y); return; }
+  gesture = { a: clampP([x, y]), b: clampP([x, y]) }; fgc.setPointerCapture(e.pointerId);
 });
-cv.addEventListener("pointermove", e => {
+fgc.addEventListener("pointermove", e => {
   if (drag) {
-    const [x, y] = pos(e);
-    drag.x = Math.max(0, Math.min(W, x)); drag.y = Math.max(0, Math.min(H, y)); draw();
-  } else if (gesture) { gesture.b = clampP(pos(e)); draw(); }
-  else if (tool === "move" && !track && !playing) {
-    const [x, y] = pos(e);
-    const hit = Math.hypot(ball.x - x, ball.y - y) < 1.8 || players.some(p => (p.team === 0 || on("showAway")) && Math.hypot(p.x - x, p.y - y) < 2.2);
-    cv.style.cursor = hit ? "grab" : "default";
-  } else cv.style.cursor = tool === "move" ? "default" : "crosshair";
+    const [x, y] = gnd(e);
+    drag.x = Math.max(0, Math.min(W, x + dragOff[0])); drag.y = Math.max(0, Math.min(H, y + dragOff[1])); draw();
+  } else if (gesture) { gesture.b = clampP(gnd(e)); draw(); }
+  else if (tool === "move" && !track && !playing) { const [sx, sy] = ptr(e); fgc.style.cursor = hitPlayer(sx, sy) ? "grab" : "default"; }
+  else fgc.style.cursor = tool === "move" ? "default" : "crosshair";
 });
 const endPointer = () => {
   drag = null;
   if (gesture) {
-    const { a, b } = gesture, col = $("annCol").value, len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    const { a, b } = gesture, color = $("annCol").value, len = Math.hypot(b[0] - a[0], b[1] - a[1]);
     if (len > 1.5) {
-      if (tool === "zone") ann.push({ type: "zone", c: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], r: [Math.abs(b[0] - a[0]) / 2, Math.abs(b[1] - a[1]) / 2], color: col });
-      else ann.push({ type: tool, a, b, color: col });
+      if (tool === "zone") ann.push({ type: "zone", c: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], r: [Math.abs(b[0] - a[0]) / 2, Math.abs(b[1] - a[1]) / 2], color });
+      else ann.push({ type: tool, a, b, color });
     }
     gesture = null; draw();
   }
 };
-cv.addEventListener("pointerup", endPointer);
-cv.addEventListener("pointercancel", endPointer);
+fgc.addEventListener("pointerup", endPointer); fgc.addEventListener("pointercancel", endPointer);
 function eraseAt(x, y) {
   for (let i = ann.length - 1; i >= 0; i--) {
     const a = ann[i]; let hit = false;
-    if (a.type === "run" || a.type === "pass") hit = dseg(x, y, a.a, a.b) < 2;
+    if (a.type === "run" || a.type === "pass") hit = dseg(x, y, a.a, a.b) < 2.5;
     else if (a.type === "zone") hit = ((x - a.c[0]) / Math.max(1, a.r[0])) ** 2 + ((y - a.c[1]) / Math.max(1, a.r[1])) ** 2 <= 1;
-    else if (a.type === "text") hit = x > a.x - 1 && x < a.x + a.s.length * 1.2 + 2 && Math.abs(y - a.y) < 2;
+    else if (a.type === "text") hit = Math.hypot(x - a.x, y - a.y) < 4;
     else if (a.type === "spot") { const p = visible().find(q => q.team === a.team && q.num === a.num); hit = !!p && Math.hypot(p.x - x, p.y - y) < 4; }
     if (hit) { ann.splice(i, 1); draw(); return; }
   }
 }
-function openText(x, y) {
+function openText(sx, sy, x, y) {
   const inp = $("txtIn"); inp.hidden = false; inp.value = "";
-  inp.style.left = Math.min(x * scale, cv.clientWidth - 160) + "px"; inp.style.top = y * scale + "px";
-  inp.dataset.x = x; inp.dataset.y = y; setTimeout(() => inp.focus(), 0);
+  inp.style.left = Math.min(sx, VW - 170) + "px"; inp.style.top = Math.max(8, sy - 36) + "px"; inp.dataset.x = x; inp.dataset.y = y; setTimeout(() => inp.focus(), 0);
 }
 $("txtIn").addEventListener("keydown", e => {
   const inp = e.target;
@@ -702,10 +841,9 @@ $("txtIn").addEventListener("keydown", e => {
 function setTool(t) {
   tool = t; $("txtIn").hidden = true;
   document.querySelectorAll(".tool[data-tool]").forEach(b => b.classList.toggle("on", b.dataset.tool === t));
-  cv.style.cursor = t === "move" ? "default" : "crosshair";
-  const tips = { move: "Drag players or the ball to set a shape.", run: "Drag from a player to where they run.", pass: "Drag from the passer to the receiver.",
-    zone: "Drag to mark an area.", spot: "Click a player to spotlight them. Click again to remove.", text: "Click the pitch, type a label, press Enter.", erase: "Click a drawing to remove it." };
-  $("hint").textContent = tips[t];
+  fgc.style.cursor = t === "move" ? "default" : "crosshair";
+  $("hint").textContent = { move: "Drag players or the ball to set a shape.", run: "Drag from a player to where they run.", pass: "Drag from the passer to the receiver.",
+    zone: "Drag to mark an area.", spot: "Click a player to spotlight them. Click again to remove.", text: "Click the pitch, type a label, press Enter.", erase: "Click a drawing to remove it." }[t];
 }
 document.querySelectorAll(".tool[data-tool]").forEach(b => b.onclick = () => setTool(b.dataset.tool));
 $("undo").onclick = () => { ann.pop(); draw(); };
@@ -717,17 +855,64 @@ function chips() {
   if (!frames.length) { box.innerHTML = '<span class="note" style="margin:0">None yet. Set a shape, then add a keyframe.</span>'; return; }
   frames.forEach((_, i) => {
     const d = document.createElement("div"); d.className = "chip" + (i === cur ? " on" : "");
-    const a = document.createElement("button"); a.textContent = "Frame " + (i + 1);
-    a.onclick = () => loadKf(i);
+    const a = document.createElement("button"); a.textContent = "Frame " + (i + 1); a.onclick = () => loadKf(i);
     const b = document.createElement("button"); b.textContent = "x"; b.setAttribute("aria-label", "Delete keyframe " + (i + 1));
     b.onclick = () => { frames.splice(i, 1); cur = -1; chips(); draw(); };
     d.append(a, b); box.append(d);
   });
 }
-function loadKf(i) { frames[i].forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = i; chips(); draw(); }
+function loadKf(i) { frames[i].forEach(([x, y], k) => { if (k < 22) { players[k].x = x; players[k].y = y; } else { ball.x = x; ball.y = y; } }); cur = i; chips(); draw(); }
 $("addKf").onclick = () => {
   frames.push(snap()); cur = frames.length - 1; chips(); draw();
   $("hint").textContent = frames.length < 2 ? "Now move some players and add a second keyframe." : frames.length + " keyframes saved. Press Play to animate them.";
+};
+function clearBoard() {
+  track = null; plan = null; frames = []; cur = -1; ann = []; u = 0; playing = false; moments = [];
+  setFormation(0, $("fh").value); setFormation(1, $("fa").value); ball = { x: W / 2, y: H / 2 };
+  for (const id of ["back", "swap", "flip"]) $(id).hidden = true;
+  setPlayLabel(); chips(); computeMoments(); sync(); draw();
+}
+window.clearBoard = clearBoard;
+$("newBoard").onclick = () => { clearBoard(); $("hint").textContent = "Blank board. Drag players, add keyframes, press Play."; };
+
+/* ---------- demo content: a built-up attack, and a synthetic tracked match with a plan ---------- */
+function loadDemoMove() {
+  $("fh").value = "4-3-3"; $("fa").value = "4-4-2"; clearBoard();
+  const B = snap(), mk = fn => B.map((p, k) => fn(k, p[0], p[1]));
+  const k1 = mk((k, x, y) => k === 22 ? [28, 40] : [x, y]);
+  const k2 = mk((k, x, y) => k === 22 ? [52, 34] : k === 0 || k === 11 ? [x, y] : k < 11 ? [x + (k < 5 ? 12 : k < 8 ? 15 : 9), y] : [x - (k < 16 ? 8 : k < 20 ? 10 : 7), y]);
+  const k3 = k2.map((p, k) => {
+    const [x, y] = p;
+    if (k === 22) return [84, 52];
+    if (k === 4) return [74, 61];                      // right-back overlaps
+    if (k === 7) return [78, 49];                      // 8 drives into the half-space
+    if (k === 10) return [90, 54];                     // winger takes it wide
+    if (k === 9) return [91, 33]; if (k === 8) return [88, 20];
+    if (k >= 11 && k < 22) return [x - 3, y + (y < 34 ? 5 : 9)];
+    return k > 0 && k < 11 ? [x + 4, y] : [x, y];
+  });
+  const k4 = k3.map((p, k) => k === 22 ? [97, 34] : k === 9 ? [98, 34] : k === 8 ? [93, 24] : k === 7 ? [90, 44] : k === 10 ? [88, 56] : p);
+  frames = [k1, k2, k3, k4]; loadKf(0); chips();
+}
+function buildDemoMatch() {
+  const fps = 5, dur = 20, nf = fps * dur + 1, hf = FORM["4-3-3"], af = FORM["4-4-2"], planF = [], actF = [];
+  for (let i = 0; i < nf; i++) {
+    const t = i / fps, lift = t < 6 ? 0 : t < 8 ? 6.8 * (t - 6) / 2 : t < 12 ? 6.8 : t < 14 ? 6.8 * (14 - t) / 2 : 0;
+    const pp = [], aa = [];
+    for (let team = 0; team < 2; team++) (team ? af : hf).forEach(([d, y], k) => {
+      const base = team ? W - d : d, id = team * 11 + k + 1;
+      const wob = Math.sin(t * 1.3 + id) * .5, shift = team ? -(k > 0 ? lift * .35 : 0) : (k === 0 ? 0 : lift * (k < 5 ? 1 : k < 8 ? .75 : .45));
+      pp.push({ id, team, x: +base.toFixed(2), y });
+      aa.push({ id, team, x: +(base + shift + wob).toFixed(2), y: +(y + Math.cos(t * 1.1 + id) * .6).toFixed(2) });
+    });
+    planF.push({ t: +t.toFixed(2), players: pp }); actF.push({ t: +t.toFixed(2), players: aa });
+  }
+  return { plan: { fps, frames: planF }, track: { fps, frames: actF } };
+}
+$("demoMatch").onclick = () => {
+  const d = buildDemoMatch(); plan = d.plan; useTrack(d.track);
+  $("hint").textContent = "Demo match: synthetic data made in your browser. Home's back line steps up from 6 s. See Plan vs actual and Key moments on the right.";
+  computeMoments(); sync(); draw();
 };
 
 /* ---------- playback (keyframes or tracking) ---------- */
@@ -737,8 +922,7 @@ function setPlayLabel() { $("play").textContent = $("play2").textContent = playi
 function togglePlay() {
   if (length() < 1) { $("hint").textContent = "Add at least two keyframes first."; return; }
   playing = !playing; if (playing && u >= length()) u = 0;
-  setPlayLabel(); syncVideo(true);
-  lastTs = performance.now(); if (playing) requestAnimationFrame(tick);
+  setPlayLabel(); syncVideo(true); lastTs = performance.now(); if (playing) requestAnimationFrame(tick);
 }
 const tAt = () => track.frames[Math.min(track.frames.length - 1, Math.round(u))].t;
 function syncVideo(seek) {
@@ -748,7 +932,7 @@ function syncVideo(seek) {
   if (playing) vid.play().catch(() => {}); else vid.pause();
 }
 function showVideo(f) {
-  vid.src = URL.createObjectURL(f); vid.hidden = false;
+  vid.src = URL.createObjectURL(f); vid.hidden = false; sizeAll();
   $("hint").textContent = track ? "Video loaded. It now plays in step with the tracking replay."
     : "Video loaded. Run pipeline.py on this clip, then load the tracking.json it creates to replay it beside the video.";
 }
@@ -759,7 +943,7 @@ function tick(ts) {
   if (track && !vid.hidden && Math.abs(vid.currentTime - tAt()) > .35) vid.currentTime = tAt();
   if (u >= length()) {
     u = length(); playing = false; setPlayLabel();
-    if (!track) frames[frames.length - 1].forEach(([x, y], k) => { players[k].x = x; players[k].y = y; });
+    if (!track) frames[frames.length - 1].forEach(([x, y], k) => { if (k < 22) { players[k].x = x; players[k].y = y; } else { ball.x = x; ball.y = y; } });
     vid.pause();
   }
   sync(); draw(); if (playing) requestAnimationFrame(tick);
@@ -780,8 +964,8 @@ $("scrub").oninput = e => {
   u = e.target.value / 1000 * length(); if (!track) playing = true; sync(); draw(); if (!track) playing = false;
   if (track && !vid.hidden) vid.currentTime = tAt();
 };
-for (const id of ["showAway", "showRuns", "showHull", "showLines", "showOff", "showSpace", "showTrails", "showNames"]) $(id).onchange = draw;
-for (const id of ["n0", "n1"]) $(id).oninput = draw;
+for (const id of ["showAway", "showRuns", "showHull", "showLines", "showOff", "showSpace", "showTrails", "showNames"]) $(id).onchange = () => draw();
+for (const id of ["n0", "n1"]) $(id).oninput = () => draw();
 
 /* ---------- save / load ---------- */
 let mode = "board";
@@ -792,12 +976,16 @@ const pick = kind => {
 };
 const download = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); };
 $("save").onclick = () => download(new Blob([JSON.stringify({
-  version: 2, frames, players: snap(), ann, ball, names, teams: { n: [tname(0), tname(1)], c: [C.home, C.away], f: [$("fh").value, $("fa").value] } })], { type: "application/json" }), "tactics-board.json");
+  version: 3, frames, players: snap().slice(0, 22), ann, ball, names, teams: { n: [tname(0), tname(1)], c: [C.home, C.away], f: [$("fh").value, $("fa").value] } })], { type: "application/json" }), "tactics-board.json");
 $("load").onclick = () => pick("board");
 $("loadTrack").onclick = () => pick("track");
 $("loadPlan").onclick = () => pick("plan");
 $("planOff").oninput = () => { computeMoments(); draw(); };
 $("thr").oninput = () => { computeMoments(); draw(); };
+function useTrack(d) {
+  if (!d.frames || !d.frames.length || !d.frames[0].players) throw new Error("Not a tracking file");
+  track = d; u = 0; playing = false; setPlayLabel(); for (const id of ["back", "swap", "flip"]) $(id).hidden = false;
+}
 $("file").onchange = async e => {
   const f = e.target.files[0]; if (!f) return;
   if (f.type.startsWith("audio/") || /\.(mp3|wav|m4a|aac)$/i.test(f.name)) {
@@ -809,12 +997,9 @@ $("file").onchange = async e => {
     if (mode === "plan") {
       if (!d.frames || !d.frames.length || !d.frames[0].players || !d.fps) throw new Error("Not a plan or tracking file");
       plan = d;
-      $("hint").textContent = track ? "Plan overlay loaded. Set \"Plan starts at\" to the match time where the plan begins."
-        : "Plan overlay loaded. Now load a tracking.json to compare it with.";
+      $("hint").textContent = track ? "Plan overlay loaded. Set \"Plan starts at\" to the match time where the plan begins." : "Plan overlay loaded. Now load a tracking.json to compare it with.";
     } else if (mode === "track") {
-      if (!d.frames || !d.frames.length || !d.frames[0].players) throw new Error("Not a tracking file");
-      track = d; u = 0; playing = false; setPlayLabel(); for (const id of ["back", "swap", "flip"]) $(id).hidden = false;
-      $("hint").textContent = "Tracking replay: " + d.frames.length + " frames at " + d.fps + " fps.";
+      useTrack(d); $("hint").textContent = "Tracking replay: " + d.frames.length + " frames at " + d.fps + " fps.";
     } else {
       frames = d.frames || []; (d.players || []).forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = -1;
       ann = d.ann || []; if (d.ball) ball = d.ball;
@@ -846,22 +1031,45 @@ $("exportPlan").onclick = () => {
   const at = (s, t) => players.map((p, k) => ({
     id: p.team * 11 + p.num, team: p.team,
     x: +lerp(frames[s][k][0], frames[s + 1][k][0], t).toFixed(2), y: +lerp(frames[s][k][1], frames[s + 1][k][1], t).toFixed(2) }));
-  for (let s = 0; s < frames.length - 1; s++) for (let n = 0; n < per; n++)
-    out.push({ t: +(s * 1.6 + n / fps).toFixed(2), players: at(s, ease(n / per)) });
+  for (let s = 0; s < frames.length - 1; s++) for (let n = 0; n < per; n++) out.push({ t: +(s * 1.6 + n / fps).toFixed(2), players: at(s, ease(n / per)) });
   out.push({ t: +((frames.length - 1) * 1.6).toFixed(2), players: at(frames.length - 2, 1) });
   download(new Blob([JSON.stringify({ fps, frames: out })], { type: "application/json" }), "plan-tracking.json");
   $("hint").textContent = "Exported plan-tracking.json. Load it with Load tracking / video.";
 };
-$("png").onclick = () => cv.toBlob(b => download(b, "tactics-board.png"));
 
-/* ---------- line-ups, view modes, shortcuts ---------- */
+/* ---------- snapshot: warp the ground layer into the view and add the screen layer ---------- */
+function tri(o, img, s, d) {
+  const [[x0, y0], [x1, y1], [x2, y2]] = s, [[u0, v0], [u1, v1], [u2, v2]] = d;
+  const det = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0); if (!det) return;
+  const a = ((u1 - u0) * (y2 - y0) - (u2 - u0) * (y1 - y0)) / det, c = ((u2 - u0) * (x1 - x0) - (u1 - u0) * (x2 - x0)) / det;
+  const b = ((v1 - v0) * (y2 - y0) - (v2 - v0) * (y1 - y0)) / det, dd = ((v2 - v0) * (x1 - x0) - (v1 - v0) * (x2 - x0)) / det;
+  o.save();
+  const cx = (u0 + u1 + u2) / 3, cy = (v0 + v1 + v2) / 3, grow = p => [p[0] + Math.sign(p[0] - cx) * .8, p[1] + Math.sign(p[1] - cy) * .8];
+  o.beginPath(); d.map(grow).forEach((p, i) => i ? o.lineTo(p[0], p[1]) : o.moveTo(p[0], p[1])); o.closePath(); o.clip();
+  o.setTransform(a, b, c, dd, u0 - a * x0 - c * y0, v0 - b * x0 - dd * y0); o.drawImage(img, 0, 0); o.restore();
+}
+$("png").onclick = () => {
+  const k = 2, out = document.createElement("canvas"); out.width = VW * k; out.height = VH * k; const o = out.getContext("2d");
+  const bg = o.createLinearGradient(0, 0, 0, out.height); bg.addColorStop(0, "#05070f"); bg.addColorStop(1, "#0d1a22"); o.fillStyle = bg; o.fillRect(0, 0, out.width, out.height);
+  const GW = gc.width, GH = gc.height, N = 36;
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+    const s = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]].map(([a, b]) => [a / N * GW, b / N * GH]);
+    const d = s.map(([x, y]) => { const q = ap(Hg, x, y); return [q[0] * k, q[1] * k]; });
+    tri(o, gc, [s[0], s[1], s[2]], [d[0], d[1], d[2]]); tri(o, gc, [s[0], s[2], s[3]], [d[0], d[2], d[3]]);
+  }
+  o.setTransform(1, 0, 0, 1, 0, 0); o.drawImage(fgc, 0, 0, out.width, out.height);
+  out.toBlob(b => download(b, "tactics-board.png"));
+};
+
+/* ---------- line-ups, present mode, shortcuts ---------- */
 function lineup() {
   const box = $("lineup"); box.innerHTML = "";
   for (const t of [0, 1]) {
     const colDiv = document.createElement("div"); colDiv.style.cssText = "display:flex;flex-direction:column;gap:4px";
     for (let i = 0; i < 11; i++) {
       const row = document.createElement("div"), n = document.createElement("b"), inp = document.createElement("input");
-      n.textContent = i + 1; inp.value = names[t][i]; inp.placeholder = t ? "Away " + (i + 1) : "Home " + (i + 1);
+      row.style.cssText = "display:flex;gap:6px;align-items:center";
+      n.textContent = i + 1; inp.value = names[t][i]; inp.placeholder = (t ? "Away " : "Home ") + (i + 1);
       inp.setAttribute("aria-label", (t ? "Away" : "Home") + " player " + (i + 1) + " name");
       inp.oninput = () => { names[t][i] = inp.value.trim(); draw(); };
       row.append(n, inp); colDiv.append(row);
@@ -870,12 +1078,10 @@ function lineup() {
   }
 }
 lineup();
-$("tiltBtn").onclick = () => { const on = document.body.classList.toggle("tilt"); $("tiltBtn").classList.toggle("on", on);
-  if (on) { setTool("move"); $("hint").textContent = "3D view is for presenting. Switch it off to edit."; } };
 $("presentBtn").onclick = () => {
-  const on = document.body.classList.toggle("present"); $("presentBtn").textContent = on ? "Exit" : "Present";
-  if (on) document.documentElement.requestFullscreen?.().catch(() => {}); else if (document.fullscreenElement) document.exitFullscreen();
-  setTimeout(resize, 50);
+  const p = document.body.classList.toggle("present"); $("presentBtn").textContent = p ? "Exit" : "Present";
+  if (p) document.documentElement.requestFullscreen?.().catch(() => {}); else if (document.fullscreenElement) document.exitFullscreen();
+  setTimeout(sizeAll, 80);
 };
 document.addEventListener("keydown", e => {
   if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
@@ -886,11 +1092,13 @@ document.addEventListener("keydown", e => {
   else if (k === " ") { togglePlay(); e.preventDefault(); }
   else if (k === "arrowleft") step(-1); else if (k === "arrowright") step(1);
   else if (k === "k") $("addKf").click();
+  else if (k === "c") { const order = ["broadcast", "high", "top"], cu = order.findIndex(n => VIEWS[n] === camGoal); setView(order[(cu + 1) % 3]); }
   else if (k === "escape" && document.body.classList.contains("present")) $("presentBtn").click();
 });
+window.addEventListener("resize", sizeAll);
+new ResizeObserver(sizeAll).observe(viewEl);
 
-new ResizeObserver(resize).observe($("pitchWrap"));
-chips(); computeMoments(); resize();
+loadDemoMove(); computeMoments(); sizeAll();
 </script>
 </body>
 </html>
