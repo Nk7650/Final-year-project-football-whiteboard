@@ -50,7 +50,7 @@ Calibration with four clicks fits exactly, so its own residual says nothing. Val
 - 8-10 participants (players or coaches), all adults, with informed consent and approval in place first.
 - Tasks, for example: set a 4-4-2, build a two-keyframe press, load a tracked replay, and say how far the back line differed from plan at a given time.
 - Measure task completion, time on task and errors, then the System Usability Scale. Compare with a whiteboard baseline on the same tasks.
-- SUS scoring: for each odd item subtract 1 from the score, for each even item subtract the score from 5, sum the ten values and multiply by 2.5. The widely quoted average is about 68, but treat it as context, not a pass mark.
+- SUS scoring: for each odd item subtract 1 from the score, for each even item subtract the score from 5, sum the ten values and multiply by 2.5. The average of about 68 is quoted in secondary sources only (see SOURCES.md), so treat it as context, not a pass mark.
 
 | Participant group | n | Mean SUS | Task completion | Notes |
 |---|---|---|---|---|

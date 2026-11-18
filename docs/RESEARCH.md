@@ -55,11 +55,11 @@ Licences change. Record the version and terms of each dataset at the time of use
 
 ## Literature anchors
 
-These were collected for the specification and **must be checked against the original sources before they are cited in the report** (authors, years, pages, URLs).
+Verification status of each item is in [SOURCES.md](SOURCES.md). Anything marked unverified there must be checked before it is cited in the report.
 
 - Decroos et al. (2019), VAEP: valuing actions by their effect on scoring and conceding.
-- Singh (2019), Expected Threat.
-- Spearman (2018) and Fernandez and Bornn (2018): pitch control and space creation.
+- Singh (2018), Expected Threat (blog post, not peer reviewed).
+- Spearman (2018), pitch control; Fernandez and Bornn (2018), space occupation. Check each venue.
 - Rein and Memmert (2016): big data and tactical analysis in elite football.
 - Bewley et al. (2016), SORT; Zhang et al. (2022), ByteTrack: multi-object tracking.
 - Redmon et al. (2016), YOLO: real-time detection.

@@ -22,7 +22,7 @@ Commits that were produced with AI assistance carry a `Co-Authored-By: Claude` t
 
 ## What I must do myself (and have not delegated)
 
-- **Verify every reference.** The bibliography was written from the model's memory, apart from the StatsBomb terms, which were checked online. Authors, years, pages and URLs must be checked against the originals before submission.
+- **Verify every reference.** The bibliography was written from memory; [SOURCES.md](SOURCES.md) records which entries were later checked online. Authors, years, pages and URLs must be checked against the originals before submission.
 - **Run and test on real footage.** AI-generated code has been unit tested but the pipeline has not yet been validated on real video. I am responsible for the results I report.
 - **Understand every part.** I need to be able to explain the code, the maths (homography, the metric definitions) and the design decisions in the Q&A with both supervisors. See the questions list in [WIP_PRESENTATION.md](WIP_PRESENTATION.md).
 - **Confirm facts about the module, the ethics process and dataset licences** with the module leader, supervisor and original sources.
