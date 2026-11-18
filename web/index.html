@@ -51,6 +51,8 @@ th{color:var(--mute);font-size:13px}
   <label>Home colour <input type="color" id="c0" value="#f2c14e"></label>
   <label>Away colour <input type="color" id="c1" value="#5fb0e8"></label>
   <button id="exportPlan">Export plan as tracking</button>
+  <button id="loadPlan">Load plan overlay</button>
+  <label>Plan starts at <input type="number" id="planOff" value="0" step="0.5" min="0" style="width:64px"> s</label>
   <button id="swap" hidden>Swap teams</button>
   <button id="flip" hidden>Flip sides</button>
   <button id="back" hidden>Back to board</button>
@@ -69,6 +71,14 @@ th{color:var(--mute);font-size:13px}
       <tr><td>Depth</td><td id="md0">-</td><td id="md1">-</td></tr>
       <tr><td>Back line height</td><td id="ml0">-</td><td id="ml1">-</td></tr></tbody></table>
     <p class="note">Outfield players only. Back line is the average distance from own goal of the four deepest outfield players.</p>
+    <div id="pvaBox" hidden>
+      <h2 style="margin-top:16px">Plan vs actual (actual minus plan, m)</h2>
+      <table><thead><tr><th></th><th>Home</th><th>Away</th></tr></thead>
+        <tbody><tr><td>Width</td><td id="pw0">-</td><td id="pw1">-</td></tr>
+        <tr><td>Depth</td><td id="pd0">-</td><td id="pd1">-</td></tr>
+        <tr><td>Back line height</td><td id="pl0">-</td><td id="pl1">-</td></tr></tbody></table>
+      <p class="note" id="pvaNote">Dashed rings show where the plan had each player.</p>
+    </div>
     <h2 style="margin-top:16px">Keyframes</h2>
     <div class="chips" id="chips"></div>
     <p class="note" id="hint">Drag players, then add a keyframe. Add two or more and press Play to animate.</p>
@@ -89,6 +99,7 @@ const vid = $("vid");
 
 let players = [], frames = [], cur = -1;       // frames: arrays of [x, y] x 22
 let track = null;                               // tracking replay {fps, frames}
+let plan = null;                                // plan overlay {fps, frames}, same format as tracking
 let u = 0, playing = false, lastTs = 0, drag = null, scale = 1;
 
 for (let t = 0; t < 2; t++) for (let i = 0; i < 11; i++) players.push({ team: t, num: i + 1, x: 0, y: 0 });
@@ -164,7 +175,7 @@ function runs() {
   ctx.setLineDash([]); ctx.globalAlpha = 1;
 }
 function draw() {
-  ctx.clearRect(0, 0, W, H); pitch(); runs();
+  ctx.clearRect(0, 0, W, H); pitch(); runs(); ghosts();
   const list = visible();
   ctx.font = "1.7px 'Segoe UI',sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
   for (const p of list) {
@@ -177,16 +188,56 @@ function draw() {
 }
 
 /* ---------- team shape metrics ---------- */
+// Same definitions as tactics/metrics.py: goalkeeper (deepest player) excluded,
+// team 0 defends x = 0, team 1 defends x = W.
+function shape(list, t) {
+  const own = list.filter(p => p.team === t).map(p => ({ d: t ? W - p.x : p.x, y: p.y })).sort((a, b) => a.d - b.d).slice(1);
+  if (own.length < 4) return null;
+  const ys = own.map(p => p.y), ds = own.map(p => p.d);
+  return { w: Math.max(...ys) - Math.min(...ys), d: Math.max(...ds) - Math.min(...ds), l: ds.slice(0, 4).reduce((a, b) => a + b, 0) / 4 };
+}
 function metrics(list) {
   for (const t of [0, 1]) {
-    const own = list.filter(p => p.team === t).map(p => ({ d: t ? W - p.x : p.x, y: p.y })).sort((a, b) => a.d - b.d).slice(1); // drop goalkeeper
-    const set = (id, v) => $(id + t).textContent = v;
-    if (own.length < 4) { set("mw", "-"); set("md", "-"); set("ml", "-"); continue; }
-    const ys = own.map(p => p.y), ds = own.map(p => p.d);
-    set("mw", (Math.max(...ys) - Math.min(...ys)).toFixed(1));
-    set("md", (Math.max(...ds) - Math.min(...ds)).toFixed(1));
-    set("ml", (ds.slice(0, 4).reduce((a, b) => a + b, 0) / 4).toFixed(1));
+    const s = shape(list, t), set = (id, v) => $(id + t).textContent = v;
+    if (!s) { set("mw", "-"); set("md", "-"); set("ml", "-"); continue; }
+    set("mw", s.w.toFixed(1)); set("md", s.d.toFixed(1)); set("ml", s.l.toFixed(1));
   }
+  planPanel(list);
+}
+
+/* ---------- plan overlay ---------- */
+const planOffset = () => parseFloat($("planOff").value) || 0;
+function planFrame() {
+  if (!track || !plan) return null;
+  const tp = track.frames[Math.min(track.frames.length - 1, Math.round(u))].t - planOffset();
+  const tol = 0.5 / plan.fps;
+  if (tp < plan.frames[0].t - tol || tp > plan.frames[plan.frames.length - 1].t + tol) return null;
+  let best = plan.frames[0], bd = Infinity;
+  for (const f of plan.frames) { const d = Math.abs(f.t - tp); if (d < bd) { bd = d; best = f; } }
+  return best;
+}
+function ghosts() {
+  const pf = planFrame(); if (!pf) return;
+  ctx.setLineDash([.6, .5]); ctx.lineWidth = .22; ctx.globalAlpha = .95;
+  for (const p of pf.players) {
+    if (p.team && !$("showAway").checked) continue;
+    ctx.strokeStyle = p.team ? C.away : C.home;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2.1, 0, 7); ctx.stroke();
+  }
+  ctx.setLineDash([]); ctx.globalAlpha = 1;
+}
+function planPanel(list) {
+  const box = $("pvaBox"); box.hidden = !(track && plan);
+  if (box.hidden) return;
+  const pf = planFrame(), note = $("pvaNote");
+  for (const t of [0, 1]) {
+    const a = shape(list, t), b = pf ? shape(pf.players, t) : null;
+    for (const [id, k] of [["pw", "w"], ["pd", "d"], ["pl", "l"]]) {
+      const d = a && b ? a[k] - b[k] : null;
+      $(id + t).textContent = d === null ? "-" : (d > 0 ? "+" : "") + d.toFixed(1);
+    }
+  }
+  note.textContent = pf ? "Dashed rings show where the plan had each player." : "The plan has no frame at this time. Change \"Plan starts at\" to line it up.";
 }
 
 /* ---------- dragging ---------- */
@@ -275,6 +326,8 @@ $("save").onclick = () => {
 };
 $("load").onclick = () => pick("board");
 $("loadTrack").onclick = () => pick("track");
+$("loadPlan").onclick = () => pick("plan");
+$("planOff").oninput = draw;
 $("file").onchange = async e => {
   const f = e.target.files[0]; if (!f) return;
   if (f.type.startsWith("audio/") || /\.(mp3|wav|m4a|aac)$/i.test(f.name)) {
@@ -283,7 +336,12 @@ $("file").onchange = async e => {
   if (f.type.startsWith("video/") || /\.(mp4|mov|webm|m4v)$/i.test(f.name)) { showVideo(f); return; }
   try {
     const d = JSON.parse(await f.text());
-    if (mode === "track") {
+    if (mode === "plan") {
+      if (!d.frames || !d.frames.length || !d.frames[0].players || !d.fps) throw new Error("Not a plan or tracking file");
+      plan = d;
+      $("hint").textContent = track ? "Plan overlay loaded. Set \"Plan starts at\" to the match time where the plan begins."
+        : "Plan overlay loaded. Now load a tracking.json to compare it with.";
+    } else if (mode === "track") {
       if (!d.frames || !d.frames.length || !d.frames[0].players) throw new Error("Not a tracking file");
       track = d; u = 0; playing = false; for (const id of ["back", "swap", "flip"]) $(id).hidden = false;
       $("hint").textContent = "Tracking replay: " + d.frames.length + " frames at " + d.fps + " fps.";
