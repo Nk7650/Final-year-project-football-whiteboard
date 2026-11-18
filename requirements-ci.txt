@@ -1,0 +1,4 @@
+# Lightweight set used by CI and for running the tests: no OpenCV or YOLO needed.
+numpy
+scipy
+pytest

@@ -1,0 +1,20 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.vscode/
+.DS_Store
+
+# Model weights and footage stay out of the repo (size, licensing, ethics)
+*.pt
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Local pipeline output (sample data lives in data/ and is tracked)
+/tracking.json
+/tracking.csv
+/tracking.txt
+/runs/
