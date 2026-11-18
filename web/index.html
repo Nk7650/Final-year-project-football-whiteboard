@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tactics board</title>
+<style>
+:root{--bg:#161c1f;--panel:#1f272b;--ink:#e8efe9;--mute:#93a39b;--line:#334048;--home:#f2c14e;--away:#5fb0e8}
+@media (prefers-color-scheme:light){:root{--bg:#eef2ee;--panel:#fff;--ink:#1a2422;--mute:#5b6b64;--line:#cdd8d1}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+h1{font-size:17px;margin:0 8px 0 0;font-weight:650}
+label{color:var(--mute);font-size:13px;display:flex;gap:6px;align-items:center}
+select,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 10px}
+button{cursor:pointer}button:hover{border-color:var(--home)}
+button.primary{background:var(--home);color:#241c05;border-color:var(--home);font-weight:600}
+:focus-visible{outline:2px solid var(--home);outline-offset:2px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px;padding:14px 16px}
+@media (max-width:860px){main{grid-template-columns:1fr}}
+#stage{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px}
+canvas{width:100%;display:block;border-radius:6px;touch-action:none}
+video{width:100%;max-height:300px;margin-top:10px;border-radius:6px;background:#000}
+video[hidden]{display:none}
+.bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.bar input[type=range]{flex:1;accent-color:var(--home)}
+aside{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;align-self:start}
+h2{font-size:14px;margin:0 0 8px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td,th{padding:3px 0;text-align:right;font-weight:400}th:first-child,td:first-child{text-align:left;color:var(--mute)}
+th{color:var(--mute);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.chip button{border:0;border-radius:0;padding:3px 9px}
+.chip.on{border-color:var(--home)}
+.note{color:var(--mute);font-size:13px;margin:6px 0 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Tactics board</h1>
+  <label>Home <select id="fh"></select></label>
+  <label>Away <select id="fa"></select></label>
+  <label><input type="checkbox" id="showAway" checked> Away team</label>
+  <label><input type="checkbox" id="showRuns" checked> Runs</label>
+  <button id="addKf" class="primary">Add keyframe</button>
+  <button id="play">Play</button>
+  <button id="save">Save board</button>
+  <button id="load">Load board</button>
+  <button id="loadTrack">Load tracking / video</button>
+  <label>Home colour <input type="color" id="c0" value="#f2c14e"></label>
+  <label>Away colour <input type="color" id="c1" value="#5fb0e8"></label>
+  <button id="exportPlan">Export plan as tracking</button>
+  <button id="swap" hidden>Swap teams</button>
+  <button id="flip" hidden>Flip sides</button>
+  <button id="back" hidden>Back to board</button>
+  <input type="file" id="file" accept=".json" hidden>
+</header>
+<main>
+  <section id="stage">
+    <canvas id="c"></canvas>
+    <video id="vid" controls muted playsinline hidden></video>
+    <div class="bar"><button id="play2" aria-label="Play or pause">Play</button><input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Timeline"><span id="clock" class="note">0.0 s</span></div>
+  </section>
+  <aside>
+    <h2>Team shape (metres)</h2>
+    <table><thead><tr><th></th><th>Home</th><th>Away</th></tr></thead>
+      <tbody><tr><td>Width</td><td id="mw0">-</td><td id="mw1">-</td></tr>
+      <tr><td>Depth</td><td id="md0">-</td><td id="md1">-</td></tr>
+      <tr><td>Back line height</td><td id="ml0">-</td><td id="ml1">-</td></tr></tbody></table>
+    <p class="note">Outfield players only. Back line is the average distance from own goal of the four deepest outfield players.</p>
+    <h2 style="margin-top:16px">Keyframes</h2>
+    <div class="chips" id="chips"></div>
+    <p class="note" id="hint">Drag players, then add a keyframe. Add two or more and press Play to animate.</p>
+  </aside>
+</main>
+<script>
+const W = 105, H = 68;
+const FORM = {
+  "4-3-3":   [[5,34],[25,10],[25,26],[25,42],[25,58],[50,14],[50,34],[50,54],[78,12],[78,34],[78,56]],
+  "4-4-2":   [[5,34],[25,10],[25,26],[25,42],[25,58],[52,8],[52,26],[52,42],[52,60],[78,26],[78,42]],
+  "3-5-2":   [[5,34],[24,16],[24,34],[24,52],[45,6],[45,62],[52,20],[52,34],[52,48],[78,26],[78,42]],
+  "4-2-3-1": [[5,34],[25,10],[25,26],[25,42],[25,58],[44,24],[44,44],[62,12],[62,34],[62,56],[80,34]]
+};
+const C = { home: "#f2c14e", away: "#5fb0e8" };
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+const $ = id => document.getElementById(id);
+const vid = $("vid");
+
+let players = [], frames = [], cur = -1;       // frames: arrays of [x, y] x 22
+let track = null;                               // tracking replay {fps, frames}
+let u = 0, playing = false, lastTs = 0, drag = null, scale = 1;
+
+for (let t = 0; t < 2; t++) for (let i = 0; i < 11; i++) players.push({ team: t, num: i + 1, x: 0, y: 0 });
+for (const f of [$("fh"), $("fa")]) for (const k in FORM) f.add(new Option(k, k));
+$("fa").value = "4-4-2";
+
+function setFormation(team, name) {
+  FORM[name].forEach(([d, y], i) => {
+    const p = players[team * 11 + i];
+    p.x = team ? W - d : d; p.y = y;
+  });
+}
+setFormation(0, "4-3-3"); setFormation(1, "4-4-2");
+$("fh").onchange = e => { setFormation(0, e.target.value); draw(); };
+$("fa").onchange = e => { setFormation(1, e.target.value); draw(); };
+
+/* ---------- geometry helpers ---------- */
+const snap = () => players.map(p => [p.x, p.y]);
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t * t * (3 - 2 * t);
+
+function visible() {
+  if (track) {
+    const f = track.frames[Math.min(track.frames.length - 1, Math.round(u))];
+    return f.players.map(p => ({ team: p.team, num: p.id, x: p.x, y: p.y }));
+  }
+  let list = players;
+  if (playing && frames.length > 1) {
+    const i = Math.max(0, Math.min(frames.length - 2, Math.floor(u))), t = ease(Math.max(0, Math.min(1, u - i)));
+    list = players.map((p, k) => ({ ...p, x: lerp(frames[i][k][0], frames[i + 1][k][0], t), y: lerp(frames[i][k][1], frames[i + 1][k][1], t) }));
+  }
+  return $("showAway").checked ? list : list.filter(p => p.team === 0);
+}
+
+/* ---------- drawing ---------- */
+function resize() {
+  const dpr = window.devicePixelRatio || 1, w = cv.clientWidth;
+  scale = w / W;
+  cv.width = w * dpr; cv.height = H * scale * dpr;
+  cv.style.height = H * scale + "px";
+  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+  draw();
+}
+function pitch() {
+  for (let i = 0; i < 15; i++) { ctx.fillStyle = i % 2 ? "#2d6a3c" : "#2a6338"; ctx.fillRect(i * W / 15, 0, W / 15 + .1, H); }
+  ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = .2;
+  ctx.strokeRect(.2, .2, W - .4, H - .4);
+  ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
+  ctx.beginPath(); ctx.arc(W / 2, H / 2, 9.15, 0, 7); ctx.stroke();
+  for (const s of [0, 1]) {
+    const x = s ? W : 0, dir = s ? -1 : 1;
+    ctx.strokeRect(s ? W - 16.5 : 0, (H - 40.32) / 2, 16.5, 40.32);
+    ctx.strokeRect(s ? W - 5.5 : 0, (H - 18.32) / 2, 5.5, 18.32);
+    ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, .25, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, 9.15, s ? Math.PI - .926 : -.926, s ? Math.PI + .926 : .926); ctx.stroke();
+  }
+}
+function runs() {
+  if (track || !$("showRuns").checked || frames.length < 2) return;
+  ctx.setLineDash([.8, .6]); ctx.lineWidth = .18;
+  for (let i = 0; i < frames.length - 1; i++) players.forEach((p, k) => {
+    if (p.team && !$("showAway").checked) return;
+    const [x0, y0] = frames[i][k], [x1, y1] = frames[i + 1][k];
+    if (Math.hypot(x1 - x0, y1 - y0) < 1) return;
+    ctx.strokeStyle = p.team ? C.away : C.home; ctx.globalAlpha = .75;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    const a = Math.atan2(y1 - y0, x1 - x0);
+    ctx.setLineDash([]); ctx.beginPath();
+    ctx.moveTo(x1, y1); ctx.lineTo(x1 - 1.4 * Math.cos(a - .45), y1 - 1.4 * Math.sin(a - .45));
+    ctx.moveTo(x1, y1); ctx.lineTo(x1 - 1.4 * Math.cos(a + .45), y1 - 1.4 * Math.sin(a + .45)); ctx.stroke();
+    ctx.setLineDash([.8, .6]);
+  });
+  ctx.setLineDash([]); ctx.globalAlpha = 1;
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H); pitch(); runs();
+  const list = visible();
+  ctx.font = "1.7px 'Segoe UI',sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (const p of list) {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7);
+    ctx.fillStyle = p.team ? C.away : C.home; ctx.fill();
+    ctx.lineWidth = .2; ctx.strokeStyle = "#101614"; ctx.stroke();
+    ctx.fillStyle = "#101614"; ctx.fillText(p.num, p.x, p.y + .1);
+  }
+  metrics(list);
+}
+
+/* ---------- team shape metrics ---------- */
+function metrics(list) {
+  for (const t of [0, 1]) {
+    const own = list.filter(p => p.team === t).map(p => ({ d: t ? W - p.x : p.x, y: p.y })).sort((a, b) => a.d - b.d).slice(1); // drop goalkeeper
+    const set = (id, v) => $(id + t).textContent = v;
+    if (own.length < 4) { set("mw", "-"); set("md", "-"); set("ml", "-"); continue; }
+    const ys = own.map(p => p.y), ds = own.map(p => p.d);
+    set("mw", (Math.max(...ys) - Math.min(...ys)).toFixed(1));
+    set("md", (Math.max(...ds) - Math.min(...ds)).toFixed(1));
+    set("ml", (ds.slice(0, 4).reduce((a, b) => a + b, 0) / 4).toFixed(1));
+  }
+}
+
+/* ---------- dragging ---------- */
+const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / scale, (e.clientY - r.top) / scale]; };
+cv.addEventListener("pointerdown", e => {
+  if (track || playing) return;
+  const [x, y] = pos(e);
+  drag = players.filter(p => p.team === 0 || $("showAway").checked).find(p => Math.hypot(p.x - x, p.y - y) < 2.2) || null;
+  if (drag) cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const [x, y] = pos(e);
+  drag.x = Math.max(0, Math.min(W, x)); drag.y = Math.max(0, Math.min(H, y)); draw();
+});
+cv.addEventListener("pointerup", () => drag = null);
+
+/* ---------- keyframes ---------- */
+function chips() {
+  const box = $("chips"); box.innerHTML = "";
+  frames.forEach((_, i) => {
+    const d = document.createElement("div"); d.className = "chip" + (i === cur ? " on" : "");
+    const a = document.createElement("button"); a.textContent = "Frame " + (i + 1);
+    a.onclick = () => { frames[i].forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = i; chips(); draw(); };
+    const b = document.createElement("button"); b.textContent = "x"; b.setAttribute("aria-label", "Delete keyframe " + (i + 1));
+    b.onclick = () => { frames.splice(i, 1); cur = -1; chips(); draw(); };
+    d.append(a, b); box.append(d);
+  });
+}
+$("addKf").onclick = () => {
+  frames.push(snap()); cur = frames.length - 1; chips(); draw();
+  $("hint").textContent = frames.length < 2 ? "Now move some players and add a second keyframe." : frames.length + " keyframes saved. Press Play to animate them.";
+};
+
+/* ---------- playback (keyframes or tracking) ---------- */
+const length = () => track ? track.frames.length - 1 : frames.length - 1;
+function togglePlay() {
+  if (length() < 1) { $("hint").textContent = "Add at least two keyframes first."; return; }
+  playing = !playing; if (playing && u >= length()) u = 0;
+  $("play").textContent = $("play2").textContent = playing ? "Pause" : "Play";
+  syncVideo(true);
+  lastTs = performance.now(); if (playing) requestAnimationFrame(tick);
+}
+const tAt = () => track.frames[Math.min(track.frames.length - 1, Math.round(u))].t;
+function syncVideo(seek) {
+  if (!track || vid.hidden) return;
+  if (seek) vid.currentTime = tAt();
+  if (playing) vid.play().catch(() => {}); else vid.pause();
+}
+function showVideo(f) {
+  vid.src = URL.createObjectURL(f); vid.hidden = false;
+  $("hint").textContent = track ? "Video loaded. It now plays in step with the tracking replay."
+    : "Video loaded. Run pipeline.py on this clip, then load the tracking.json it creates to replay it beside the video.";
+}
+function tick(ts) {
+  if (!playing) return;
+  const dt = Math.max(0, (ts - lastTs) / 1000); lastTs = ts;
+  u = Math.max(0, u + (track ? dt * track.fps : dt / 1.6));
+  if (track && !vid.hidden && Math.abs(vid.currentTime - tAt()) > .35) vid.currentTime = tAt();
+  if (u >= length()) {
+    u = length(); playing = false; $("play").textContent = $("play2").textContent = "Play";
+    if (!track) frames[frames.length - 1].forEach(([x, y], k) => { players[k].x = x; players[k].y = y; });
+    vid.pause();
+  }
+  sync(); draw(); if (playing) requestAnimationFrame(tick);
+}
+function sync() {
+  $("scrub").value = length() > 0 ? (u / length()) * 1000 : 0;
+  $("clock").textContent = (track ? u / track.fps : u * 1.6).toFixed(1) + " s";
+}
+$("play").onclick = $("play2").onclick = togglePlay;
+$("scrub").oninput = e => { if (length() < 1) return; u = e.target.value / 1000 * length(); if (!track) playing = true; sync(); draw(); if (!track) playing = false;
+  if (track && !vid.hidden) vid.currentTime = tAt(); };
+for (const id of ["showAway", "showRuns"]) $(id).onchange = draw;
+
+/* ---------- save / load ---------- */
+let mode = "board";
+const pick = kind => {
+  mode = kind; $("file").value = "";
+  $("file").accept = kind === "track" ? ".json,video/*,audio/*,.mp4,.mov,.webm,.mp3" : ".json";
+  $("file").click();
+};
+$("save").onclick = () => {
+  const blob = new Blob([JSON.stringify({ frames, players: snap() })], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "tactics-board.json"; a.click();
+};
+$("load").onclick = () => pick("board");
+$("loadTrack").onclick = () => pick("track");
+$("file").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  if (f.type.startsWith("audio/") || /\.(mp3|wav|m4a|aac)$/i.test(f.name)) {
+    $("hint").textContent = "Audio files like MP3 contain no player positions, so there is nothing to track. Load an MP4 video or a tracking.json file instead."; return;
+  }
+  if (f.type.startsWith("video/") || /\.(mp4|mov|webm|m4v)$/i.test(f.name)) { showVideo(f); return; }
+  try {
+    const d = JSON.parse(await f.text());
+    if (mode === "track") {
+      if (!d.frames || !d.frames.length || !d.frames[0].players) throw new Error("Not a tracking file");
+      track = d; u = 0; playing = false; for (const id of ["back", "swap", "flip"]) $(id).hidden = false;
+      $("hint").textContent = "Tracking replay: " + d.frames.length + " frames at " + d.fps + " fps.";
+    } else {
+      frames = d.frames || []; (d.players || []).forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = -1; chips();
+    }
+    sync(); draw();
+  } catch (err) { $("hint").textContent = "Could not load that file: " + err.message; }
+};
+$("back").onclick = () => { track = null; u = 0; for (const id of ["back", "swap", "flip"]) $(id).hidden = true; $("hint").textContent = "Back on the board."; sync(); draw(); };
+
+/* ---------- colours, swap, flip, export ---------- */
+$("c0").oninput = e => { C.home = e.target.value; draw(); };
+$("c1").oninput = e => { C.away = e.target.value; draw(); };
+const eachPlayer = fn => track.frames.forEach(f => f.players.forEach(fn));
+$("swap").onclick = () => { eachPlayer(p => p.team = 1 - p.team); draw(); };            // team 0 <-> team 1
+$("flip").onclick = () => { eachPlayer(p => { p.x = W - p.x; p.y = H - p.y; }); draw(); }; // rotate pitch 180 degrees
+$("exportPlan").onclick = () => {
+  if (frames.length < 2) { $("hint").textContent = "Add at least two keyframes first, then export."; return; }
+  const fps = 5, per = Math.round(1.6 * fps), out = [];
+  const at = (s, t, n) => players.map((p, k) => ({
+    id: p.team * 11 + p.num, team: p.team,
+    x: +lerp(frames[s][k][0], frames[s + 1][k][0], t).toFixed(2), y: +lerp(frames[s][k][1], frames[s + 1][k][1], t).toFixed(2) }));
+  for (let s = 0; s < frames.length - 1; s++) for (let n = 0; n < per; n++)
+    out.push({ t: +(s * 1.6 + n / fps).toFixed(2), players: at(s, ease(n / per)) });
+  out.push({ t: +((frames.length - 1) * 1.6).toFixed(2), players: at(frames.length - 2, 1) });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({ fps, frames: out })], { type: "application/json" }));
+  a.download = "plan-tracking.json"; a.click();
+  $("hint").textContent = "Exported plan-tracking.json. Load it with Load tracking / video.";
+};
+
+new ResizeObserver(resize).observe(cv.parentElement);
+resize();
+</script>
+</body>
+</html>
