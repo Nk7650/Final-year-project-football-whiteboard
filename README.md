@@ -8,6 +8,15 @@ A web tactics board where a coach plans formations and pressing as animated keyf
 
 *Synthetic demo data. Dashed rings are the plan; solid players are the "tracked" positions; the panel shows actual minus plan in metres.*
 
+## The board
+
+`web/index.html` is a single-file analysis board in a broadcast style: draw runs, pass lines, zones, labels and player spotlights; overlay team shape, defensive line, offside line, space control and movement trails; replay tracked matches beside the video; compare against a plan, with key moments flagged and clickable on the timeline. Presentation mode, 3D view and PNG snapshot are built in. Shortcuts: V move, R run, P pass, Z zone, S spotlight, T label, E eraser, K keyframe, Space play, arrows step, Ctrl+Z undo.
+
+![Analysis layers](docs/img/03-analysis-layers.png)
+![3D view with space control](docs/img/04-3d-space-control.png)
+
+"Space owned" is the share of pitch closer to each team's nearest player. It is a simple proxy and is not the published pitch-control model.
+
 ## The problem
 
 Amateur and university teams plan tactics on whiteboards and review matches by re-watching video. Professional analytics platforms do much more but are costly and closed. There is little low-cost tooling that connects a coach's plan to what actually happened. This project builds that link and, importantly, **measures how well it works**: tracking accuracy against hand annotation, agreement with coaches' judgement of key moments, and usability. See [docs/RESEARCH.md](docs/RESEARCH.md).

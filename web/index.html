@@ -3,87 +3,225 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tactics board</title>
+<title>Tactics Lab - match analysis board</title>
 <style>
-:root{--bg:#161c1f;--panel:#1f272b;--ink:#e8efe9;--mute:#93a39b;--line:#334048;--home:#f2c14e;--away:#5fb0e8}
-@media (prefers-color-scheme:light){:root{--bg:#eef2ee;--panel:#fff;--ink:#1a2422;--mute:#5b6b64;--line:#cdd8d1}}
+:root{
+  --bg:#070b14; --bg2:#0d1424; --panel:#111a2e; --panel2:#16213a; --line:#243252; --text:#e8eefc; --mute:#8a99bd;
+  --accent:#38bdf8; --accent2:#22d3a6; --warn:#fbbf24; --danger:#f87171;
+  --font: Inter, "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,sans-serif}
-header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
-h1{font-size:17px;margin:0 8px 0 0;font-weight:650}
-label{color:var(--mute);font-size:13px;display:flex;gap:6px;align-items:center}
-select,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 10px}
-button{cursor:pointer}button:hover{border-color:var(--home)}
-button.primary{background:var(--home);color:#241c05;border-color:var(--home);font-weight:600}
-:focus-visible{outline:2px solid var(--home);outline-offset:2px}
-main{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px;padding:14px 16px}
-@media (max-width:860px){main{grid-template-columns:1fr}}
-#stage{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px}
-canvas{width:100%;display:block;border-radius:6px;touch-action:none}
-video{width:100%;max-height:300px;margin-top:10px;border-radius:6px;background:#000}
-video[hidden]{display:none}
-.bar{display:flex;gap:10px;align-items:center;margin-top:10px}
-.bar input[type=range]{flex:1;accent-color:var(--home)}
-aside{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;align-self:start}
-h2{font-size:14px;margin:0 0 8px}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:radial-gradient(1200px 600px at 20% -10%,#14234a 0%,var(--bg) 60%);color:var(--text);font:14px/1.45 var(--font);display:flex;flex-direction:column;min-height:100vh}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+/* header */
+header{display:flex;align-items:center;gap:16px;padding:10px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0d1730,#0a1120)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:13px}
+.logo{width:30px;height:30px;border-radius:8px;background:conic-gradient(from 200deg,var(--accent),var(--accent2),var(--accent));display:grid;place-items:center;box-shadow:0 0 18px #38bdf855}
+.logo svg{width:18px;height:18px}
+.brand small{display:block;font-weight:500;letter-spacing:.06em;color:var(--mute);font-size:11px;text-transform:none}
+.spacer{flex:1}
+.hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;display:inline-flex;gap:6px;align-items:center}
+.hbtn:hover{border-color:var(--accent)}
+.hbtn.primary{background:linear-gradient(180deg,#2aa8e8,#1b82c4);border-color:#4cc2ff;font-weight:600}
+.hbtn.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+/* layout */
+main{flex:1;display:grid;grid-template-columns:56px minmax(0,1fr) 340px;gap:14px;padding:14px 18px 8px}
+#tools{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px;align-self:start}
+.tool{width:38px;height:38px;border-radius:10px;border:1px solid transparent;background:transparent;display:grid;place-items:center;color:var(--mute);position:relative}
+.tool svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tool:hover{background:var(--panel2);color:var(--text)}
+.tool.on{background:#12304d;color:var(--accent);border-color:var(--accent)}
+.tool[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:46px;top:50%;transform:translateY(-50%);background:#000c;border:1px solid var(--line);padding:3px 8px;border-radius:6px;white-space:nowrap;font-size:12px;color:var(--text);z-index:10}
+.sep{height:1px;background:var(--line);margin:4px 2px}
+#annCol{width:30px;height:30px;border:0;background:none;padding:0;margin:2px auto;cursor:pointer}
+#stage{min-width:0}
+#pitchBox{background:linear-gradient(180deg,#0b1222,#0a101d);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 20px 60px #0008, inset 0 0 0 1px #ffffff08;perspective:1700px;overflow:hidden}
+#pitchWrap{position:relative;width:min(100%,calc((100vh - 270px)*1.544));min-width:320px;margin:0 auto;transition:transform .6s cubic-bezier(.2,.7,.2,1);transform-origin:50% 70%}
+canvas#c{display:block;width:100%;border-radius:6px;box-shadow:0 14px 40px #000a;touch-action:none}
+video#vid{display:block;width:100%;margin-top:10px;border-radius:10px;background:#000;max-height:30vh}
+.tilt #pitchWrap{transform:rotateX(46deg) scale(.96) translateY(-4%)}
+.tilt #c{pointer-events:none;box-shadow:0 40px 60px #000c}
+#txtIn{position:absolute;z-index:5;background:#0009;border:1px solid var(--accent);border-radius:6px;padding:4px 8px;color:#fff;min-width:140px}
+/* dock */
+#dock{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.ctl{display:flex;gap:6px;align-items:center}
+.round{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center}
+.round.big{width:48px;height:48px;background:linear-gradient(180deg,#2aa8e8,#1b82c4);border-color:#4cc2ff;font-size:12px;font-weight:700}
+.round svg{width:18px;height:18px;fill:currentColor}
+#timeline{position:relative;padding-top:12px}
+#marks{position:absolute;left:0;right:0;top:0;height:12px;pointer-events:none}
+#marks i{position:absolute;top:0;width:10px;height:10px;margin-left:-5px;background:var(--warn);border-radius:2px;transform:rotate(45deg);box-shadow:0 0 8px #fbbf2488}
+input[type=range]{width:100%;accent-color:var(--accent)}
+#clock{font:600 15px/1 ui-monospace,Menlo,Consolas,monospace;min-width:70px;text-align:right}
+.mini{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:12px}
+#hint{margin:8px 4px 0;color:var(--mute);font-size:12.5px;min-height:18px}
+/* side panel */
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.card h3{margin:0 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700;display:flex;justify-content:space-between;align-items:center}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-td,th{padding:3px 0;text-align:right;font-weight:400}th:first-child,td:first-child{text-align:left;color:var(--mute)}
-th{color:var(--mute);font-size:13px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.chip{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-.chip button{border:0;border-radius:0;padding:3px 9px}
-.chip.on{border-color:var(--home)}
-.note{color:var(--mute);font-size:13px;margin:6px 0 0}
+th{font-size:11px;color:var(--mute);font-weight:600;text-align:right;padding:2px 0;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:5px 0;border-top:1px solid #ffffff0d;text-align:right;font-weight:600}
+td:first-child{font-weight:400;color:var(--mute)}
+.note{color:var(--mute);font-size:12px;margin:6px 0 0}
+.teamrow{display:grid;grid-template-columns:28px 1fr 96px;gap:8px;align-items:center;margin-bottom:8px}
+.teamrow input[type=color]{width:28px;height:28px;border:0;background:none;padding:0}
+.teamrow input[type=text],.teamrow select,.mini-in{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;width:100%}
+.layers{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.layers label{display:flex;gap:7px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12.5px;cursor:pointer}
+.layers input{accent-color:var(--accent)}
+.bar2{height:8px;border-radius:5px;overflow:hidden;display:flex;margin:6px 0 2px;background:#0006}
+.bar2 i{display:block;height:100%}
+#moments{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:210px;overflow:auto}
+#moments li button{width:100%;text-align:left;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px;padding:7px 10px;font-size:12.5px}
+#moments li button:hover{border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--bg2)}
+.chip button{background:none;border:0;padding:4px 10px;font-size:12px}
+.chip.on{border-color:var(--accent)}
+details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.lineup{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:8px}
+.lineup div{display:flex;gap:6px;align-items:center}
+.lineup b{font-size:11px;width:16px;color:var(--mute);text-align:right}
+.lineup input{background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:3px 6px;width:100%;font-size:12px}
+.present main{grid-template-columns:1fr}
+.present aside,.present #tools,.present header .hide-present{display:none!important}
+.present #pitchWrap{width:min(100%,calc((100vh - 190px)*1.544))}
+@media(max-width:1100px){main{grid-template-columns:48px minmax(0,1fr)}aside{grid-column:1/-1}#pitchWrap{width:100%}}
+@media(max-width:640px){main{grid-template-columns:1fr;padding:10px}#tools{flex-direction:row;flex-wrap:wrap}#dock{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
-  <h1>Tactics board</h1>
-  <label>Home <select id="fh"></select></label>
-  <label>Away <select id="fa"></select></label>
-  <label><input type="checkbox" id="showAway" checked> Away team</label>
-  <label><input type="checkbox" id="showRuns" checked> Runs</label>
-  <button id="addKf" class="primary">Add keyframe</button>
-  <button id="play">Play</button>
-  <button id="save">Save board</button>
-  <button id="load">Load board</button>
-  <button id="loadTrack">Load tracking / video</button>
-  <label>Home colour <input type="color" id="c0" value="#f2c14e"></label>
-  <label>Away colour <input type="color" id="c1" value="#5fb0e8"></label>
-  <button id="exportPlan">Export plan as tracking</button>
-  <button id="loadPlan">Load plan overlay</button>
-  <label>Plan starts at <input type="number" id="planOff" value="0" step="0.5" min="0" style="width:64px"> s</label>
-  <button id="swap" hidden>Swap teams</button>
-  <button id="flip" hidden>Flip sides</button>
-  <button id="back" hidden>Back to board</button>
+  <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#06101f" stroke-width="2.4" stroke-linecap="round"><circle cx="6" cy="17" r="2"/><circle cx="18" cy="7" r="2"/><path d="M8 16c5-1 5-8 8-8"/></svg></div>
+    <div>Tactics Lab<small>Plan it. Replay it. Compare it.</small></div></div>
+  <span class="spacer"></span>
+  <span class="hide-present" style="display:contents">
+  <button id="addKf" class="hbtn primary">+ Keyframe</button>
+  <button id="play2" class="hbtn" aria-label="Play or pause">Play</button>
+  <button id="loadTrack" class="hbtn">Load tracking / video</button>
+  <button id="loadPlan" class="hbtn">Load plan overlay</button>
+  <button id="exportPlan" class="hbtn">Export plan</button>
+  <button id="save" class="hbtn">Save board</button>
+  <button id="load" class="hbtn">Load board</button>
+  </span>
+  <button id="png" class="hbtn">Snapshot PNG</button>
+  <button id="tiltBtn" class="hbtn">3D view</button>
+  <button id="presentBtn" class="hbtn">Present</button>
   <input type="file" id="file" accept=".json" hidden>
 </header>
+
 <main>
+  <nav id="tools" aria-label="Drawing tools">
+    <button class="tool on" data-tool="move" data-tip="Move players (V)"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-2 6z"/></svg></button>
+    <button class="tool" data-tool="run" data-tip="Run (R)"><svg viewBox="0 0 24 24"><path d="M4 18c4-9 9-10 15-9"/><path d="M15 5l4 4-4 4"/></svg></button>
+    <button class="tool" data-tool="pass" data-tip="Pass line (P)"><svg viewBox="0 0 24 24"><circle cx="5" cy="19" r="2"/><path d="M7 17L19 5"/><path d="M12 5h7v7"/></svg></button>
+    <button class="tool" data-tool="zone" data-tip="Zone (Z)"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="6"/></svg></button>
+    <button class="tool" data-tool="spot" data-tip="Spotlight player (S)"><svg viewBox="0 0 24 24"><path d="M12 3l5 14H7z"/><ellipse cx="12" cy="19" rx="6" ry="2"/></svg></button>
+    <button class="tool" data-tool="text" data-tip="Label (T)"><svg viewBox="0 0 24 24"><path d="M5 6h14M12 6v13"/></svg></button>
+    <button class="tool" data-tool="erase" data-tip="Eraser (E)"><svg viewBox="0 0 24 24"><path d="M4 16l9-10 7 6-6 7H8z"/></svg></button>
+    <div class="sep"></div>
+    <input type="color" id="annCol" value="#ffffff" title="Drawing colour" aria-label="Drawing colour">
+    <button class="tool" id="undo" data-tip="Undo drawing (Ctrl+Z)"><svg viewBox="0 0 24 24"><path d="M9 7L4 12l5 5"/><path d="M4 12h10a6 6 0 010 8"/></svg></button>
+    <button class="tool" id="clearAnn" data-tip="Clear drawings"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg></button>
+  </nav>
+
   <section id="stage">
-    <canvas id="c"></canvas>
-    <video id="vid" controls muted playsinline hidden></video>
-    <div class="bar"><button id="play2" aria-label="Play or pause">Play</button><input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Timeline"><span id="clock" class="note">0.0 s</span></div>
+    <div id="pitchBox">
+      <div id="pitchWrap">
+        <canvas id="c"></canvas>
+        <input id="txtIn" type="text" placeholder="Type, press Enter" hidden>
+      </div>
+      <video id="vid" controls muted playsinline hidden></video>
+    </div>
+    <div id="dock">
+      <div class="ctl">
+        <button class="round" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+        <button class="round big" id="play" aria-label="Play or pause">Play</button>
+        <button class="round" id="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></button>
+      </div>
+      <div id="timeline"><div id="marks"></div><input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Timeline"></div>
+      <div class="ctl">
+        <select id="speed" class="mini" aria-label="Speed"><option value=".5">0.5x</option><option value="1" selected>1x</option><option value="2">2x</option><option value="4">4x</option></select>
+        <span id="clock">0.0 s</span>
+      </div>
+    </div>
+    <p id="hint">Drag players to set a shape. Add keyframes and press Play. Pick a tool on the left to draw runs, passes and zones.</p>
   </section>
+
   <aside>
-    <h2>Team shape (metres)</h2>
-    <table><thead><tr><th></th><th>Home</th><th>Away</th></tr></thead>
-      <tbody><tr><td>Width</td><td id="mw0">-</td><td id="mw1">-</td></tr>
-      <tr><td>Depth</td><td id="md0">-</td><td id="md1">-</td></tr>
-      <tr><td>Back line height</td><td id="ml0">-</td><td id="ml1">-</td></tr></tbody></table>
-    <p class="note">Outfield players only. Back line is the average distance from own goal of the four deepest outfield players.</p>
-    <div id="pvaBox" hidden>
-      <h2 style="margin-top:16px">Plan vs actual (actual minus plan, m)</h2>
-      <table><thead><tr><th></th><th>Home</th><th>Away</th></tr></thead>
+    <div class="card">
+      <h3>Match</h3>
+      <div class="teamrow"><input type="color" id="c0" value="#f2c14e" aria-label="Home colour"><input type="text" id="n0" value="Home" aria-label="Home name"><select id="fh" aria-label="Home formation"></select></div>
+      <div class="teamrow"><input type="color" id="c1" value="#5fb0e8" aria-label="Away colour"><input type="text" id="n1" value="Away" aria-label="Away name"><select id="fa" aria-label="Away formation"></select></div>
+      <div class="chips" style="margin-top:4px">
+        <button id="swap" class="hbtn" hidden>Swap teams</button>
+        <button id="flip" class="hbtn" hidden>Flip sides</button>
+        <button id="back" class="hbtn" hidden>Back to board</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Team shape <span style="text-transform:none;letter-spacing:0;font-weight:500">metres</span></h3>
+      <table><thead><tr><th></th><th id="h0">Home</th><th id="h1">Away</th></tr></thead>
+        <tbody><tr><td>Width</td><td id="mw0">-</td><td id="mw1">-</td></tr>
+        <tr><td>Depth</td><td id="md0">-</td><td id="md1">-</td></tr>
+        <tr><td>Back line height</td><td id="ml0">-</td><td id="ml1">-</td></tr>
+        <tr><td>Space owned</td><td id="sc0">-</td><td id="sc1">-</td></tr></tbody></table>
+      <div class="bar2" aria-hidden="true"><i id="scb0" style="width:50%;background:#f2c14e"></i><i id="scb1" style="width:50%;background:#5fb0e8"></i></div>
+      <p class="note">Outfield players only. Back line = mean distance from own goal of the four deepest outfield players. Space owned = pitch area closer to that team's nearest player (a simple proxy, not a full pitch-control model).</p>
+    </div>
+
+    <div class="card">
+      <h3>Analysis layers</h3>
+      <div class="layers">
+        <label><input type="checkbox" id="showAway" checked> Away team</label>
+        <label><input type="checkbox" id="showNames"> Names</label>
+        <label><input type="checkbox" id="showRuns" checked> Runs</label>
+        <label><input type="checkbox" id="showHull"> Team shape</label>
+        <label><input type="checkbox" id="showLines"> Defensive line</label>
+        <label><input type="checkbox" id="showOff"> Offside line</label>
+        <label><input type="checkbox" id="showSpace"> Space control</label>
+        <label><input type="checkbox" id="showTrails"> Trails</label>
+      </div>
+    </div>
+
+    <div class="card" id="pvaBox" hidden>
+      <h3>Plan vs actual <span style="text-transform:none;letter-spacing:0;font-weight:500">actual - plan (m)</span></h3>
+      <table><thead><tr><th></th><th id="ph0">Home</th><th id="ph1">Away</th></tr></thead>
         <tbody><tr><td>Width</td><td id="pw0">-</td><td id="pw1">-</td></tr>
         <tr><td>Depth</td><td id="pd0">-</td><td id="pd1">-</td></tr>
         <tr><td>Back line height</td><td id="pl0">-</td><td id="pl1">-</td></tr></tbody></table>
       <p class="note" id="pvaNote">Dashed rings show where the plan had each player.</p>
+      <div style="display:flex;gap:10px;margin-top:8px;align-items:center;flex-wrap:wrap">
+        <label class="note" style="margin:0">Plan starts at <input type="number" id="planOff" value="0" step="0.5" min="0" class="mini-in" style="width:64px"> s</label>
+        <label class="note" style="margin:0">Flag at <input type="number" id="thr" value="5" step="0.5" min="1" class="mini-in" style="width:56px"> m</label>
+      </div>
     </div>
-    <h2 style="margin-top:16px">Keyframes</h2>
-    <div class="chips" id="chips"></div>
-    <p class="note" id="hint">Drag players, then add a keyframe. Add two or more and press Play to animate.</p>
+
+    <div class="card" id="momCard" hidden>
+      <h3>Key moments <span id="momCount" style="text-transform:none;letter-spacing:0;font-weight:500"></span></h3>
+      <ul id="moments"></ul>
+      <p class="note">A moment is a back line at least the flagged distance from plan for 2 s or more. Click one to jump to it and check the video.</p>
+    </div>
+
+    <div class="card">
+      <h3>Keyframes</h3>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="card">
+      <details><summary>Line-ups</summary>
+        <div class="lineup" id="lineup"></div>
+      </details>
+    </div>
   </aside>
 </main>
+
 <script>
 const W = 105, H = 68;
 const FORM = {
@@ -96,11 +234,14 @@ const C = { home: "#f2c14e", away: "#5fb0e8" };
 const cv = document.getElementById("c"), ctx = cv.getContext("2d");
 const $ = id => document.getElementById(id);
 const vid = $("vid");
+const on = id => $(id).checked;
 
 let players = [], frames = [], cur = -1;       // frames: arrays of [x, y] x 22
 let track = null;                               // tracking replay {fps, frames}
 let plan = null;                                // plan overlay {fps, frames}, same format as tracking
 let u = 0, playing = false, lastTs = 0, drag = null, scale = 1;
+let tool = "move", ann = [], gesture = null, ball = { x: W / 2, y: H / 2 }, moments = [];
+const names = [Array(11).fill(""), Array(11).fill("")];
 
 for (let t = 0; t < 2; t++) for (let i = 0; i < 11; i++) players.push({ team: t, num: i + 1, x: 0, y: 0 });
 for (const f of [$("fh"), $("fa")]) for (const k in FORM) f.add(new Option(k, k));
@@ -116,27 +257,37 @@ setFormation(0, "4-3-3"); setFormation(1, "4-4-2");
 $("fh").onchange = e => { setFormation(0, e.target.value); draw(); };
 $("fa").onchange = e => { setFormation(1, e.target.value); draw(); };
 
-/* ---------- geometry helpers ---------- */
+/* ---------- helpers ---------- */
 const snap = () => players.map(p => [p.x, p.y]);
 const lerp = (a, b, t) => a + (b - a) * t;
 const ease = t => t * t * (3 - 2 * t);
+const col = t => t ? C.away : C.home;
+const tname = t => $("n" + t).value.trim() || (t ? "Away" : "Home");
+const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const dseg = (px, py, a, b) => {
+  const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy || 1;
+  const t = Math.max(0, Math.min(1, ((px - a[0]) * dx + (py - a[1]) * dy) / l2));
+  return Math.hypot(px - (a[0] + t * dx), py - (a[1] + t * dy));
+};
 
 function visible() {
   if (track) {
     const f = track.frames[Math.min(track.frames.length - 1, Math.round(u))];
-    return f.players.map(p => ({ team: p.team, num: p.id, x: p.x, y: p.y }));
+    const list = f.players.map(p => ({ team: p.team, num: p.id, x: p.x, y: p.y }));
+    return on("showAway") ? list : list.filter(p => p.team === 0);
   }
   let list = players;
   if (playing && frames.length > 1) {
     const i = Math.max(0, Math.min(frames.length - 2, Math.floor(u))), t = ease(Math.max(0, Math.min(1, u - i)));
     list = players.map((p, k) => ({ ...p, x: lerp(frames[i][k][0], frames[i + 1][k][0], t), y: lerp(frames[i][k][1], frames[i + 1][k][1], t) }));
   }
-  return $("showAway").checked ? list : list.filter(p => p.team === 0);
+  return on("showAway") ? list : list.filter(p => p.team === 0);
 }
 
-/* ---------- drawing ---------- */
+/* ---------- pitch ---------- */
 function resize() {
   const dpr = window.devicePixelRatio || 1, w = cv.clientWidth;
+  if (!w) return;
   scale = w / W;
   cv.width = w * dpr; cv.height = H * scale * dpr;
   cv.style.height = H * scale + "px";
@@ -144,46 +295,260 @@ function resize() {
   draw();
 }
 function pitch() {
-  for (let i = 0; i < 15; i++) { ctx.fillStyle = i % 2 ? "#2d6a3c" : "#2a6338"; ctx.fillRect(i * W / 15, 0, W / 15 + .1, H); }
-  ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = .2;
+  const n = 14;
+  for (let i = 0; i < n; i++) { ctx.fillStyle = i % 2 ? "#2f7a42" : "#2a6e3b"; ctx.fillRect(i * W / n, 0, W / n + .1, H); }
+  const g = ctx.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, W * .62);
+  g.addColorStop(0, "rgba(255,255,255,.07)"); g.addColorStop(1, "rgba(0,0,0,.34)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = .2; ctx.fillStyle = "rgba(255,255,255,.9)";
   ctx.strokeRect(.2, .2, W - .4, H - .4);
   ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
   ctx.beginPath(); ctx.arc(W / 2, H / 2, 9.15, 0, 7); ctx.stroke();
+  ctx.beginPath(); ctx.arc(W / 2, H / 2, .35, 0, 7); ctx.fill();
   for (const s of [0, 1]) {
     const x = s ? W : 0, dir = s ? -1 : 1;
     ctx.strokeRect(s ? W - 16.5 : 0, (H - 40.32) / 2, 16.5, 40.32);
     ctx.strokeRect(s ? W - 5.5 : 0, (H - 18.32) / 2, 5.5, 18.32);
-    ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, .25, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, .3, 0, 7); ctx.fill();
     ctx.beginPath(); ctx.arc(x + dir * 11, H / 2, 9.15, s ? Math.PI - .926 : -.926, s ? Math.PI + .926 : .926); ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,.16)"; ctx.fillRect(s ? W - 1.6 : 0, (H - 7.32) / 2, 1.6, 7.32);
+    ctx.strokeRect(s ? W - 1.6 : 0, (H - 7.32) / 2, 1.6, 7.32); ctx.fillStyle = "rgba(255,255,255,.9)";
+  }
+  for (const [cx, cy, a] of [[0, 0, 0], [W, 0, Math.PI / 2], [W, H, Math.PI], [0, H, 1.5 * Math.PI]]) {
+    ctx.beginPath(); ctx.arc(cx, cy, 1, a, a + Math.PI / 2); ctx.stroke();
   }
 }
+
+/* ---------- geometry for analysis layers ---------- */
+function hull(pts) {
+  const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  if (p.length < 3) return p;
+  const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const q of p) { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+  for (const q of p.slice().reverse()) { while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+const outfield = (list, t) => list.filter(p => p.team === t).sort((a, b) => (t ? W - a.x : a.x) - (t ? W - b.x : b.x)).slice(1);
+
+function drawHulls(list) {
+  for (const t of [0, 1]) {
+    const pts = outfield(list, t).map(p => [p.x, p.y]);
+    if (pts.length < 3) continue;
+    const h = hull(pts);
+    ctx.beginPath(); h.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath();
+    ctx.fillStyle = hexA(col(t), .16); ctx.fill();
+    ctx.strokeStyle = hexA(col(t), .85); ctx.lineWidth = .22; ctx.setLineDash([.9, .5]); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+function drawLines(list) {
+  for (const t of [0, 1]) {
+    const back = outfield(list, t).slice(0, 4).sort((a, b) => a.y - b.y);
+    if (back.length < 4) continue;
+    ctx.strokeStyle = hexA(col(t), .95); ctx.lineWidth = .5; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.beginPath(); back.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke();
+    ctx.lineCap = "butt";
+  }
+}
+function drawOffside(list) {
+  for (const t of [0, 1]) {
+    const own = list.filter(p => p.team === t).sort((a, b) => (t ? W - a.x : a.x) - (t ? W - b.x : b.x));
+    if (own.length < 2) continue;
+    const x = own[1].x;                                  // second-deepest player, goalkeeper included
+    ctx.strokeStyle = hexA(col(t), .95); ctx.lineWidth = .2; ctx.setLineDash([1.2, .8]);
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+let space = [50, 50];
+function spaceControl(list, paint) {
+  const cell = 3, own = [0, 0];
+  if (list.length < 2) { space = [50, 50]; return; }
+  for (let x = cell / 2; x < W; x += cell) for (let y = cell / 2; y < H; y += cell) {
+    let best = 1e9, bt = 0, second = 1e9;
+    for (const p of list) {
+      const d = Math.hypot(p.x - x, p.y - y);
+      if (d < best) { second = best; best = d; bt = p.team; } else if (d < second) second = d;
+    }
+    own[bt]++;
+    if (paint) { ctx.fillStyle = hexA(col(bt), Math.min(.3, .08 + (second - best) * .02)); ctx.fillRect(x - cell / 2, y - cell / 2, cell + .05, cell + .05); }
+  }
+  const tot = own[0] + own[1]; space = [100 * own[0] / tot, 100 * own[1] / tot];
+}
+function drawTrails() {
+  if (!track) return;
+  const i = Math.min(track.frames.length - 1, Math.round(u)), back = 25;
+  const cur = track.frames[i].players;
+  for (const p of cur) {
+    if (p.team && !on("showAway")) continue;
+    ctx.lineCap = "round";
+    let prev = [p.x, p.y];
+    for (let k = 1; k <= back && i - k >= 0; k++) {
+      const q = track.frames[i - k].players.find(z => z.id === p.id && z.team === p.team);
+      if (!q) break;
+      ctx.strokeStyle = hexA(col(p.team), .6 * (1 - k / back)); ctx.lineWidth = .45 * (1 - k / (back * 1.4));
+      ctx.beginPath(); ctx.moveTo(prev[0], prev[1]); ctx.lineTo(q.x, q.y); ctx.stroke(); prev = [q.x, q.y];
+    }
+  }
+  ctx.lineCap = "butt";
+}
+
+/* ---------- keyframe runs and plan ghosts ---------- */
 function runs() {
-  if (track || !$("showRuns").checked || frames.length < 2) return;
-  ctx.setLineDash([.8, .6]); ctx.lineWidth = .18;
+  if (track || !on("showRuns") || frames.length < 2) return;
+  ctx.lineWidth = .2;
   for (let i = 0; i < frames.length - 1; i++) players.forEach((p, k) => {
-    if (p.team && !$("showAway").checked) return;
+    if (p.team && !on("showAway")) return;
     const [x0, y0] = frames[i][k], [x1, y1] = frames[i + 1][k];
     if (Math.hypot(x1 - x0, y1 - y0) < 1) return;
-    ctx.strokeStyle = p.team ? C.away : C.home; ctx.globalAlpha = .75;
-    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-    const a = Math.atan2(y1 - y0, x1 - x0);
-    ctx.setLineDash([]); ctx.beginPath();
-    ctx.moveTo(x1, y1); ctx.lineTo(x1 - 1.4 * Math.cos(a - .45), y1 - 1.4 * Math.sin(a - .45));
-    ctx.moveTo(x1, y1); ctx.lineTo(x1 - 1.4 * Math.cos(a + .45), y1 - 1.4 * Math.sin(a + .45)); ctx.stroke();
-    ctx.setLineDash([.8, .6]);
+    arrow([x0, y0], [x1, y1], col(p.team), { dash: true, alpha: .8 });
   });
   ctx.setLineDash([]); ctx.globalAlpha = 1;
 }
-function draw() {
-  ctx.clearRect(0, 0, W, H); pitch(); runs(); ghosts();
-  const list = visible();
-  ctx.font = "1.7px 'Segoe UI',sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  for (const p of list) {
-    ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7);
-    ctx.fillStyle = p.team ? C.away : C.home; ctx.fill();
-    ctx.lineWidth = .2; ctx.strokeStyle = "#101614"; ctx.stroke();
-    ctx.fillStyle = "#101614"; ctx.fillText(p.num, p.x, p.y + .1);
+const planOffset = () => parseFloat($("planOff").value) || 0;
+function planAt(tp) {
+  if (!plan) return null;
+  const tol = 0.5 / plan.fps;
+  if (tp < plan.frames[0].t - tol || tp > plan.frames[plan.frames.length - 1].t + tol) return null;
+  let best = plan.frames[0], bd = Infinity;
+  for (const f of plan.frames) { const d = Math.abs(f.t - tp); if (d < bd) { bd = d; best = f; } }
+  return best;
+}
+function planFrame() {
+  if (!track || !plan) return null;
+  return planAt(track.frames[Math.min(track.frames.length - 1, Math.round(u))].t - planOffset());
+}
+function ghosts() {
+  const pf = planFrame(); if (!pf) return;
+  ctx.setLineDash([.6, .5]); ctx.lineWidth = .22; ctx.globalAlpha = .95;
+  for (const p of pf.players) {
+    if (p.team && !on("showAway")) continue;
+    ctx.strokeStyle = col(p.team);
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, 7); ctx.stroke();
   }
+  ctx.setLineDash([]); ctx.globalAlpha = 1;
+}
+
+/* ---------- annotations ---------- */
+function arrow(a, b, color, o = {}) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]); if (len < .5) return;
+  const nx = -(b[1] - a[1]) / len, ny = (b[0] - a[0]) / len, bend = o.curve ? len * .16 : 0;
+  const c = [(a[0] + b[0]) / 2 + nx * bend, (a[1] + b[1]) / 2 + ny * bend];
+  ctx.save();
+  ctx.globalAlpha = o.alpha ?? 1; ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = o.w || .3; ctx.lineCap = "round";
+  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = .8 * scale / 6;
+  if (o.dash) ctx.setLineDash([.8, .6]);
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(c[0], c[1], b[0], b[1]); ctx.stroke();
+  ctx.setLineDash([]);
+  const ang = Math.atan2(b[1] - c[1], b[0] - c[0]), hs = o.head || 1.5;
+  ctx.beginPath(); ctx.moveTo(b[0], b[1]);
+  ctx.lineTo(b[0] - hs * Math.cos(ang - .45), b[1] - hs * Math.sin(ang - .45));
+  ctx.lineTo(b[0] - hs * Math.cos(ang + .45), b[1] - hs * Math.sin(ang + .45)); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function drawAnn(a, list, layer) {
+  if (a.type === "spot") {
+    if (layer !== "under") return;
+    const p = list.find(q => q.team === a.team && q.num === a.num); if (!p) return;
+    const g = ctx.createLinearGradient(p.x, p.y - 14, p.x, p.y);
+    g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(255,255,255,.38)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(p.x - 1.2, p.y - 14); ctx.lineTo(p.x + 1.2, p.y - 14); ctx.lineTo(p.x + 3.6, p.y); ctx.lineTo(p.x - 3.6, p.y); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = .3; ctx.fillStyle = "rgba(255,255,255,.18)";
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + .5, 3.8, 2.3, 0, 0, 7); ctx.fill(); ctx.stroke();
+  } else if (a.type === "zone") {
+    if (layer !== "under") return;
+    ctx.fillStyle = hexA(a.color, .22); ctx.strokeStyle = a.color; ctx.lineWidth = .3; ctx.setLineDash([1, .6]);
+    ctx.beginPath(); ctx.ellipse(a.c[0], a.c[1], Math.max(.8, a.r[0]), Math.max(.8, a.r[1]), 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+  } else if (layer === "over") {
+    if (a.type === "run") arrow(a.a, a.b, a.color, { curve: true, dash: true });
+    else if (a.type === "pass") {
+      arrow(a.a, a.b, a.color, { w: .35 });
+      ctx.fillStyle = a.color; ctx.beginPath(); ctx.arc(a.a[0], a.a[1], .7, 0, 7); ctx.fill();
+    } else if (a.type === "text") {
+      ctx.font = "700 2px " + getComputedStyle(document.body).fontFamily; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      const w = ctx.measureText(a.s).width + 1.6;
+      ctx.fillStyle = "rgba(8,12,22,.82)"; roundRect(a.x - .4, a.y - 1.5, w, 3, .8); ctx.fill();
+      ctx.fillStyle = a.color; ctx.fillRect(a.x - .4, a.y - 1.5, .35, 3);
+      ctx.fillStyle = "#fff"; ctx.fillText(a.s, a.x + .6, a.y + .1);
+    }
+  }
+}
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function previewAnn() {
+  if (!gesture) return;
+  const col = $("annCol").value, { a, b } = gesture;
+  if (tool === "run") drawAnn({ type: "run", a, b, color: col }, [], "over");
+  if (tool === "pass") drawAnn({ type: "pass", a, b, color: col }, [], "over");
+  if (tool === "zone") drawAnn({ type: "zone", c: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], r: [Math.abs(b[0] - a[0]) / 2, Math.abs(b[1] - a[1]) / 2], color: col }, [], "under");
+}
+
+/* ---------- broadcast graphics inside the canvas ---------- */
+function lowerThird() {
+  const f = ["fh", "fa"].map(id => $(id).value), fam = getComputedStyle(document.body).fontFamily;
+  ctx.save(); ctx.textBaseline = "middle"; ctx.textAlign = "left";
+  let y = 2.2;
+  for (const t of [0, 1]) {
+    if (t && !on("showAway")) continue;
+    const label = tname(t).toUpperCase(), sub = track ? "TRACKED" : f[t];
+    ctx.font = "800 1.8px " + fam; const lw = ctx.measureText(label).width;
+    ctx.font = "600 1.4px " + fam; const w = lw + ctx.measureText(sub).width + 6.5; ctx.font = "800 1.8px " + fam;
+    ctx.fillStyle = "rgba(6,10,20,.84)"; roundRect(2, y, w, 3.2, .5); ctx.fill();
+    ctx.fillStyle = col(t); ctx.fillRect(2, y, .9, 3.2);
+    ctx.fillStyle = "#fff"; ctx.fillText(label, 4, y + 1.65);
+    ctx.font = "600 1.4px " + fam; ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.textAlign = "right"; ctx.fillText(sub, 2 + w - 1, y + 1.65); ctx.textAlign = "left";
+    y += 3.8;
+  }
+  const tag = track ? "REPLAY" : (playing ? "PLAN" : "BOARD");
+  ctx.font = "800 1.5px " + fam; const tw = ctx.measureText(tag).width + 3;
+  ctx.fillStyle = "rgba(6,10,20,.84)"; roundRect(W - tw - 2, 2.2, tw, 3, .5); ctx.fill();
+  ctx.fillStyle = track ? "#22d3a6" : "#38bdf8"; ctx.fillText(tag, W - tw - .5, 3.75);
+  ctx.restore();
+}
+
+/* ---------- draw ---------- */
+function drawPlayer(p) {
+  const r = 1.7, c = col(p.team);
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = scale * .25; ctx.shadowOffsetY = scale * .06;
+  const g = ctx.createRadialGradient(p.x - .5, p.y - .6, .2, p.x, p.y, r);
+  g.addColorStop(0, hexA(c, 1)); g.addColorStop(1, shade(c, -.28));
+  ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.fillStyle = g; ctx.fill();
+  ctx.shadowColor = "transparent"; ctx.lineWidth = .28; ctx.strokeStyle = "rgba(255,255,255,.92)"; ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle = lum(c) > .55 ? "#0b1220" : "#fff"; ctx.font = "800 1.75px " + getComputedStyle(document.body).fontFamily;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(p.num, p.x, p.y + .1);
+  const nm = on("showNames") && !track && names[p.team][p.num - 1];
+  if (nm) {
+    ctx.font = "700 1.4px " + getComputedStyle(document.body).fontFamily;
+    const w = ctx.measureText(nm).width + 1.2;
+    ctx.fillStyle = "rgba(6,10,20,.8)"; roundRect(p.x - w / 2, p.y + 2.1, w, 2.1, .5); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.fillText(nm, p.x, p.y + 3.2);
+  }
+}
+function lum(hex) { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; }
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16), f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`; }
+function drawBall() {
+  if (track) return;
+  ctx.save(); ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = scale * .2;
+  ctx.beginPath(); ctx.arc(ball.x, ball.y, .85, 0, 7); ctx.fillStyle = "#fff"; ctx.fill();
+  ctx.shadowColor = "transparent"; ctx.lineWidth = .15; ctx.strokeStyle = "#111"; ctx.stroke();
+  ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(ball.x, ball.y, .32, 0, 7); ctx.fill(); ctx.restore();
+}
+function draw() {
+  if (!scale) return;
+  ctx.clearRect(0, 0, W, H); pitch();
+  const list = visible();
+  spaceControl(list, on("showSpace"));
+  if (on("showHull")) drawHulls(list);
+  if (on("showTrails")) drawTrails();
+  runs(); ghosts();
+  if (on("showOff")) drawOffside(list);
+  if (on("showLines")) drawLines(list);
+  for (const a of ann) drawAnn(a, list, "under");
+  previewAnn();
+  for (const p of list) drawPlayer(p);
+  drawBall();
+  for (const a of ann) drawAnn(a, list, "over");
+  lowerThird();
   metrics(list);
 }
 
@@ -199,35 +564,19 @@ function shape(list, t) {
 function metrics(list) {
   for (const t of [0, 1]) {
     const s = shape(list, t), set = (id, v) => $(id + t).textContent = v;
+    $("h" + t).textContent = $("ph" + t).textContent = tname(t);
+    $("scb" + t).style.background = col(t);
     if (!s) { set("mw", "-"); set("md", "-"); set("ml", "-"); continue; }
     set("mw", s.w.toFixed(1)); set("md", s.d.toFixed(1)); set("ml", s.l.toFixed(1));
   }
+  const solo = !on("showAway") && !track;
+  for (const t of [0, 1]) $("sc" + t).textContent = solo ? "-" : space[t].toFixed(0) + "%";
+  $("scb0").style.width = space[0] + "%"; $("scb1").style.width = space[1] + "%";
   planPanel(list);
-}
-
-/* ---------- plan overlay ---------- */
-const planOffset = () => parseFloat($("planOff").value) || 0;
-function planFrame() {
-  if (!track || !plan) return null;
-  const tp = track.frames[Math.min(track.frames.length - 1, Math.round(u))].t - planOffset();
-  const tol = 0.5 / plan.fps;
-  if (tp < plan.frames[0].t - tol || tp > plan.frames[plan.frames.length - 1].t + tol) return null;
-  let best = plan.frames[0], bd = Infinity;
-  for (const f of plan.frames) { const d = Math.abs(f.t - tp); if (d < bd) { bd = d; best = f; } }
-  return best;
-}
-function ghosts() {
-  const pf = planFrame(); if (!pf) return;
-  ctx.setLineDash([.6, .5]); ctx.lineWidth = .22; ctx.globalAlpha = .95;
-  for (const p of pf.players) {
-    if (p.team && !$("showAway").checked) continue;
-    ctx.strokeStyle = p.team ? C.away : C.home;
-    ctx.beginPath(); ctx.arc(p.x, p.y, 2.1, 0, 7); ctx.stroke();
-  }
-  ctx.setLineDash([]); ctx.globalAlpha = 1;
 }
 function planPanel(list) {
   const box = $("pvaBox"); box.hidden = !(track && plan);
+  $("momCard").hidden = box.hidden;
   if (box.hidden) return;
   const pf = planFrame(), note = $("pvaNote");
   for (const t of [0, 1]) {
@@ -240,33 +589,142 @@ function planPanel(list) {
   note.textContent = pf ? "Dashed rings show where the plan had each player." : "The plan has no frame at this time. Change \"Plan starts at\" to line it up.";
 }
 
-/* ---------- dragging ---------- */
+/* ---------- key moments (layer 1 of the suggestion feature, in the browser) ---------- */
+function computeMoments() {
+  moments = [];
+  if (track && plan) {
+    const thr = parseFloat($("thr").value) || 5, minDur = 2;
+    for (const t of [0, 1]) {
+      let run = null;
+      const close = () => {
+        if (run && run.e - run.s >= minDur) moments.push({ ...run, team: t, avg: run.sum / run.n });
+        run = null;
+      };
+      track.frames.forEach((f, i) => {
+        const pf = planAt(f.t - planOffset());
+        const a = pf && shape(f.players, t), b = pf && shape(pf.players, t);
+        const d = a && b ? a.l - b.l : null;
+        if (d !== null && Math.abs(d) >= thr) {
+          if (!run) run = { s: f.t, i, sum: 0, n: 0, peak: 0 };
+          run.e = f.t; run.sum += d; run.n++; if (Math.abs(d) > Math.abs(run.peak)) run.peak = d;
+        } else close();
+      });
+      close();
+    }
+    moments.sort((x, y) => x.s - y.s);
+  }
+  const ul = $("moments"); ul.innerHTML = "";
+  $("momCount").textContent = moments.length ? moments.length + " flagged" : "none flagged";
+  moments.forEach(m => {
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.textContent = `${tname(m.team)} back line ${Math.abs(m.avg).toFixed(1)} m ${m.avg > 0 ? "higher" : "lower"} than planned, ${m.s.toFixed(1)} to ${m.e.toFixed(1)} s (peak ${Math.abs(m.peak).toFixed(1)} m).`;
+    b.style.borderLeftColor = col(m.team);
+    b.onclick = () => { u = m.i; playing = false; setPlayLabel(); sync(); draw(); if (!vid.hidden) vid.currentTime = tAt(); };
+    li.append(b); ul.append(li);
+  });
+  const marks = $("marks"); marks.innerHTML = "";
+  if (track) moments.forEach(m => {
+    const i = document.createElement("i"); i.style.left = (m.i / Math.max(1, track.frames.length - 1) * 100) + "%"; marks.append(i);
+  });
+}
+
+/* ---------- pointer: move players, draw annotations ---------- */
 const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / scale, (e.clientY - r.top) / scale]; };
+const clampP = ([x, y]) => [Math.max(0, Math.min(W, x)), Math.max(0, Math.min(H, y))];
 cv.addEventListener("pointerdown", e => {
-  if (track || playing) return;
   const [x, y] = pos(e);
-  drag = players.filter(p => p.team === 0 || $("showAway").checked).find(p => Math.hypot(p.x - x, p.y - y) < 2.2) || null;
-  if (drag) cv.setPointerCapture(e.pointerId);
+  if (tool === "move") {
+    if (track || playing) return;
+    if (Math.hypot(ball.x - x, ball.y - y) < 1.8) drag = ball;
+    else drag = players.filter(p => p.team === 0 || on("showAway")).find(p => Math.hypot(p.x - x, p.y - y) < 2.2) || null;
+    if (drag) cv.setPointerCapture(e.pointerId);
+    return;
+  }
+  if (tool === "erase") { eraseAt(x, y); return; }
+  if (tool === "spot") {
+    const p = visible().map(q => ({ q, d: Math.hypot(q.x - x, q.y - y) })).sort((a, b) => a.d - b.d)[0];
+    if (p && p.d < 3) {
+      const i = ann.findIndex(a => a.type === "spot" && a.team === p.q.team && a.num === p.q.num);
+      if (i >= 0) ann.splice(i, 1); else ann.push({ type: "spot", team: p.q.team, num: p.q.num });
+      draw();
+    }
+    return;
+  }
+  if (tool === "text") { openText(x, y); return; }
+  gesture = { a: clampP([x, y]), b: clampP([x, y]) };
+  cv.setPointerCapture(e.pointerId);
 });
 cv.addEventListener("pointermove", e => {
-  if (!drag) return;
-  const [x, y] = pos(e);
-  drag.x = Math.max(0, Math.min(W, x)); drag.y = Math.max(0, Math.min(H, y)); draw();
+  if (drag) {
+    const [x, y] = pos(e);
+    drag.x = Math.max(0, Math.min(W, x)); drag.y = Math.max(0, Math.min(H, y)); draw();
+  } else if (gesture) { gesture.b = clampP(pos(e)); draw(); }
+  else if (tool === "move" && !track && !playing) {
+    const [x, y] = pos(e);
+    const hit = Math.hypot(ball.x - x, ball.y - y) < 1.8 || players.some(p => (p.team === 0 || on("showAway")) && Math.hypot(p.x - x, p.y - y) < 2.2);
+    cv.style.cursor = hit ? "grab" : "default";
+  } else cv.style.cursor = tool === "move" ? "default" : "crosshair";
 });
-cv.addEventListener("pointerup", () => drag = null);
+const endPointer = () => {
+  drag = null;
+  if (gesture) {
+    const { a, b } = gesture, col = $("annCol").value, len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len > 1.5) {
+      if (tool === "zone") ann.push({ type: "zone", c: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], r: [Math.abs(b[0] - a[0]) / 2, Math.abs(b[1] - a[1]) / 2], color: col });
+      else ann.push({ type: tool, a, b, color: col });
+    }
+    gesture = null; draw();
+  }
+};
+cv.addEventListener("pointerup", endPointer);
+cv.addEventListener("pointercancel", endPointer);
+function eraseAt(x, y) {
+  for (let i = ann.length - 1; i >= 0; i--) {
+    const a = ann[i]; let hit = false;
+    if (a.type === "run" || a.type === "pass") hit = dseg(x, y, a.a, a.b) < 2;
+    else if (a.type === "zone") hit = ((x - a.c[0]) / Math.max(1, a.r[0])) ** 2 + ((y - a.c[1]) / Math.max(1, a.r[1])) ** 2 <= 1;
+    else if (a.type === "text") hit = x > a.x - 1 && x < a.x + a.s.length * 1.2 + 2 && Math.abs(y - a.y) < 2;
+    else if (a.type === "spot") { const p = visible().find(q => q.team === a.team && q.num === a.num); hit = !!p && Math.hypot(p.x - x, p.y - y) < 4; }
+    if (hit) { ann.splice(i, 1); draw(); return; }
+  }
+}
+function openText(x, y) {
+  const inp = $("txtIn"); inp.hidden = false; inp.value = "";
+  inp.style.left = Math.min(x * scale, cv.clientWidth - 160) + "px"; inp.style.top = y * scale + "px";
+  inp.dataset.x = x; inp.dataset.y = y; setTimeout(() => inp.focus(), 0);
+}
+$("txtIn").addEventListener("keydown", e => {
+  const inp = e.target;
+  if (e.key === "Enter" && inp.value.trim()) { ann.push({ type: "text", x: +inp.dataset.x, y: +inp.dataset.y, s: inp.value.trim(), color: $("annCol").value }); inp.hidden = true; draw(); }
+  else if (e.key === "Escape") inp.hidden = true;
+  e.stopPropagation();
+});
+function setTool(t) {
+  tool = t; $("txtIn").hidden = true;
+  document.querySelectorAll(".tool[data-tool]").forEach(b => b.classList.toggle("on", b.dataset.tool === t));
+  cv.style.cursor = t === "move" ? "default" : "crosshair";
+  const tips = { move: "Drag players or the ball to set a shape.", run: "Drag from a player to where they run.", pass: "Drag from the passer to the receiver.",
+    zone: "Drag to mark an area.", spot: "Click a player to spotlight them. Click again to remove.", text: "Click the pitch, type a label, press Enter.", erase: "Click a drawing to remove it." };
+  $("hint").textContent = tips[t];
+}
+document.querySelectorAll(".tool[data-tool]").forEach(b => b.onclick = () => setTool(b.dataset.tool));
+$("undo").onclick = () => { ann.pop(); draw(); };
+$("clearAnn").onclick = () => { ann = []; draw(); };
 
 /* ---------- keyframes ---------- */
 function chips() {
   const box = $("chips"); box.innerHTML = "";
+  if (!frames.length) { box.innerHTML = '<span class="note" style="margin:0">None yet. Set a shape, then add a keyframe.</span>'; return; }
   frames.forEach((_, i) => {
     const d = document.createElement("div"); d.className = "chip" + (i === cur ? " on" : "");
     const a = document.createElement("button"); a.textContent = "Frame " + (i + 1);
-    a.onclick = () => { frames[i].forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = i; chips(); draw(); };
+    a.onclick = () => loadKf(i);
     const b = document.createElement("button"); b.textContent = "x"; b.setAttribute("aria-label", "Delete keyframe " + (i + 1));
     b.onclick = () => { frames.splice(i, 1); cur = -1; chips(); draw(); };
     d.append(a, b); box.append(d);
   });
 }
+function loadKf(i) { frames[i].forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = i; chips(); draw(); }
 $("addKf").onclick = () => {
   frames.push(snap()); cur = frames.length - 1; chips(); draw();
   $("hint").textContent = frames.length < 2 ? "Now move some players and add a second keyframe." : frames.length + " keyframes saved. Press Play to animate them.";
@@ -274,17 +732,19 @@ $("addKf").onclick = () => {
 
 /* ---------- playback (keyframes or tracking) ---------- */
 const length = () => track ? track.frames.length - 1 : frames.length - 1;
+const speed = () => parseFloat($("speed").value) || 1;
+function setPlayLabel() { $("play").textContent = $("play2").textContent = playing ? "Pause" : "Play"; }
 function togglePlay() {
   if (length() < 1) { $("hint").textContent = "Add at least two keyframes first."; return; }
   playing = !playing; if (playing && u >= length()) u = 0;
-  $("play").textContent = $("play2").textContent = playing ? "Pause" : "Play";
-  syncVideo(true);
+  setPlayLabel(); syncVideo(true);
   lastTs = performance.now(); if (playing) requestAnimationFrame(tick);
 }
 const tAt = () => track.frames[Math.min(track.frames.length - 1, Math.round(u))].t;
 function syncVideo(seek) {
   if (!track || vid.hidden) return;
   if (seek) vid.currentTime = tAt();
+  vid.playbackRate = speed();
   if (playing) vid.play().catch(() => {}); else vid.pause();
 }
 function showVideo(f) {
@@ -294,11 +754,11 @@ function showVideo(f) {
 }
 function tick(ts) {
   if (!playing) return;
-  const dt = Math.max(0, (ts - lastTs) / 1000); lastTs = ts;
+  const dt = Math.max(0, (ts - lastTs) / 1000) * speed(); lastTs = ts;
   u = Math.max(0, u + (track ? dt * track.fps : dt / 1.6));
   if (track && !vid.hidden && Math.abs(vid.currentTime - tAt()) > .35) vid.currentTime = tAt();
   if (u >= length()) {
-    u = length(); playing = false; $("play").textContent = $("play2").textContent = "Play";
+    u = length(); playing = false; setPlayLabel();
     if (!track) frames[frames.length - 1].forEach(([x, y], k) => { players[k].x = x; players[k].y = y; });
     vid.pause();
   }
@@ -308,10 +768,20 @@ function sync() {
   $("scrub").value = length() > 0 ? (u / length()) * 1000 : 0;
   $("clock").textContent = (track ? u / track.fps : u * 1.6).toFixed(1) + " s";
 }
+function step(dir) {
+  if (track) { u = Math.max(0, Math.min(length(), Math.round(u) + dir)); playing = false; setPlayLabel(); if (!vid.hidden) vid.currentTime = tAt(); sync(); draw(); }
+  else if (frames.length) loadKf(Math.max(0, Math.min(frames.length - 1, (cur < 0 ? (dir > 0 ? -1 : frames.length) : cur) + dir)));
+}
+$("prev").onclick = () => step(-1); $("next").onclick = () => step(1);
 $("play").onclick = $("play2").onclick = togglePlay;
-$("scrub").oninput = e => { if (length() < 1) return; u = e.target.value / 1000 * length(); if (!track) playing = true; sync(); draw(); if (!track) playing = false;
-  if (track && !vid.hidden) vid.currentTime = tAt(); };
-for (const id of ["showAway", "showRuns"]) $(id).onchange = draw;
+$("speed").onchange = () => syncVideo(false);
+$("scrub").oninput = e => {
+  if (length() < 1) return;
+  u = e.target.value / 1000 * length(); if (!track) playing = true; sync(); draw(); if (!track) playing = false;
+  if (track && !vid.hidden) vid.currentTime = tAt();
+};
+for (const id of ["showAway", "showRuns", "showHull", "showLines", "showOff", "showSpace", "showTrails", "showNames"]) $(id).onchange = draw;
+for (const id of ["n0", "n1"]) $(id).oninput = draw;
 
 /* ---------- save / load ---------- */
 let mode = "board";
@@ -320,14 +790,14 @@ const pick = kind => {
   $("file").accept = kind === "track" ? ".json,video/*,audio/*,.mp4,.mov,.webm,.mp3" : ".json";
   $("file").click();
 };
-$("save").onclick = () => {
-  const blob = new Blob([JSON.stringify({ frames, players: snap() })], { type: "application/json" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "tactics-board.json"; a.click();
-};
+const download = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); };
+$("save").onclick = () => download(new Blob([JSON.stringify({
+  version: 2, frames, players: snap(), ann, ball, names, teams: { n: [tname(0), tname(1)], c: [C.home, C.away], f: [$("fh").value, $("fa").value] } })], { type: "application/json" }), "tactics-board.json");
 $("load").onclick = () => pick("board");
 $("loadTrack").onclick = () => pick("track");
 $("loadPlan").onclick = () => pick("plan");
-$("planOff").oninput = draw;
+$("planOff").oninput = () => { computeMoments(); draw(); };
+$("thr").oninput = () => { computeMoments(); draw(); };
 $("file").onchange = async e => {
   const f = e.target.files[0]; if (!f) return;
   if (f.type.startsWith("audio/") || /\.(mp3|wav|m4a|aac)$/i.test(f.name)) {
@@ -343,39 +813,84 @@ $("file").onchange = async e => {
         : "Plan overlay loaded. Now load a tracking.json to compare it with.";
     } else if (mode === "track") {
       if (!d.frames || !d.frames.length || !d.frames[0].players) throw new Error("Not a tracking file");
-      track = d; u = 0; playing = false; for (const id of ["back", "swap", "flip"]) $(id).hidden = false;
+      track = d; u = 0; playing = false; setPlayLabel(); for (const id of ["back", "swap", "flip"]) $(id).hidden = false;
       $("hint").textContent = "Tracking replay: " + d.frames.length + " frames at " + d.fps + " fps.";
     } else {
-      frames = d.frames || []; (d.players || []).forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = -1; chips();
+      frames = d.frames || []; (d.players || []).forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = -1;
+      ann = d.ann || []; if (d.ball) ball = d.ball;
+      if (d.names) d.names.forEach((a, t) => a.forEach((s, i) => names[t][i] = s));
+      if (d.teams) {
+        d.teams.n.forEach((s, t) => $("n" + t).value = s);
+        C.home = d.teams.c[0]; C.away = d.teams.c[1]; $("c0").value = C.home; $("c1").value = C.away;
+        $("fh").value = d.teams.f[0]; $("fa").value = d.teams.f[1];
+      }
+      chips(); lineup();
     }
-    sync(); draw();
+    computeMoments(); sync(); draw();
   } catch (err) { $("hint").textContent = "Could not load that file: " + err.message; }
 };
-$("back").onclick = () => { track = null; u = 0; for (const id of ["back", "swap", "flip"]) $(id).hidden = true; $("hint").textContent = "Back on the board."; sync(); draw(); };
+$("back").onclick = () => {
+  track = null; u = 0; moments = []; computeMoments();
+  for (const id of ["back", "swap", "flip"]) $(id).hidden = true; $("hint").textContent = "Back on the board."; sync(); draw();
+};
 
 /* ---------- colours, swap, flip, export ---------- */
 $("c0").oninput = e => { C.home = e.target.value; draw(); };
 $("c1").oninput = e => { C.away = e.target.value; draw(); };
 const eachPlayer = fn => track.frames.forEach(f => f.players.forEach(fn));
-$("swap").onclick = () => { eachPlayer(p => p.team = 1 - p.team); draw(); };            // team 0 <-> team 1
-$("flip").onclick = () => { eachPlayer(p => { p.x = W - p.x; p.y = H - p.y; }); draw(); }; // rotate pitch 180 degrees
+$("swap").onclick = () => { eachPlayer(p => p.team = 1 - p.team); computeMoments(); draw(); };            // team 0 <-> team 1
+$("flip").onclick = () => { eachPlayer(p => { p.x = W - p.x; p.y = H - p.y; }); computeMoments(); draw(); }; // rotate pitch 180 degrees
 $("exportPlan").onclick = () => {
   if (frames.length < 2) { $("hint").textContent = "Add at least two keyframes first, then export."; return; }
   const fps = 5, per = Math.round(1.6 * fps), out = [];
-  const at = (s, t, n) => players.map((p, k) => ({
+  const at = (s, t) => players.map((p, k) => ({
     id: p.team * 11 + p.num, team: p.team,
     x: +lerp(frames[s][k][0], frames[s + 1][k][0], t).toFixed(2), y: +lerp(frames[s][k][1], frames[s + 1][k][1], t).toFixed(2) }));
   for (let s = 0; s < frames.length - 1; s++) for (let n = 0; n < per; n++)
     out.push({ t: +(s * 1.6 + n / fps).toFixed(2), players: at(s, ease(n / per)) });
   out.push({ t: +((frames.length - 1) * 1.6).toFixed(2), players: at(frames.length - 2, 1) });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify({ fps, frames: out })], { type: "application/json" }));
-  a.download = "plan-tracking.json"; a.click();
+  download(new Blob([JSON.stringify({ fps, frames: out })], { type: "application/json" }), "plan-tracking.json");
   $("hint").textContent = "Exported plan-tracking.json. Load it with Load tracking / video.";
 };
+$("png").onclick = () => cv.toBlob(b => download(b, "tactics-board.png"));
 
-new ResizeObserver(resize).observe(cv.parentElement);
-resize();
+/* ---------- line-ups, view modes, shortcuts ---------- */
+function lineup() {
+  const box = $("lineup"); box.innerHTML = "";
+  for (const t of [0, 1]) {
+    const colDiv = document.createElement("div"); colDiv.style.cssText = "display:flex;flex-direction:column;gap:4px";
+    for (let i = 0; i < 11; i++) {
+      const row = document.createElement("div"), n = document.createElement("b"), inp = document.createElement("input");
+      n.textContent = i + 1; inp.value = names[t][i]; inp.placeholder = t ? "Away " + (i + 1) : "Home " + (i + 1);
+      inp.setAttribute("aria-label", (t ? "Away" : "Home") + " player " + (i + 1) + " name");
+      inp.oninput = () => { names[t][i] = inp.value.trim(); draw(); };
+      row.append(n, inp); colDiv.append(row);
+    }
+    box.append(colDiv);
+  }
+}
+lineup();
+$("tiltBtn").onclick = () => { const on = document.body.classList.toggle("tilt"); $("tiltBtn").classList.toggle("on", on);
+  if (on) { setTool("move"); $("hint").textContent = "3D view is for presenting. Switch it off to edit."; } };
+$("presentBtn").onclick = () => {
+  const on = document.body.classList.toggle("present"); $("presentBtn").textContent = on ? "Exit" : "Present";
+  if (on) document.documentElement.requestFullscreen?.().catch(() => {}); else if (document.fullscreenElement) document.exitFullscreen();
+  setTimeout(resize, 50);
+};
+document.addEventListener("keydown", e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === "z") { ann.pop(); draw(); e.preventDefault(); return; }
+  const map = { v: "move", r: "run", p: "pass", z: "zone", s: "spot", t: "text", e: "erase" };
+  if (map[k]) setTool(map[k]);
+  else if (k === " ") { togglePlay(); e.preventDefault(); }
+  else if (k === "arrowleft") step(-1); else if (k === "arrowright") step(1);
+  else if (k === "k") $("addKf").click();
+  else if (k === "escape" && document.body.classList.contains("present")) $("presentBtn").click();
+});
+
+new ResizeObserver(resize).observe($("pitchWrap"));
+chips(); computeMoments(); resize();
 </script>
 </body>
 </html>

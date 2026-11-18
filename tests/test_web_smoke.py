@@ -109,3 +109,26 @@ def test_wrong_plan_offset_is_explained_not_blank(page):
     _load(page, "#loadPlan", PLAN)
     page.fill("#planOff", "50")
     assert "no frame at this time" in page.inner_text("#pvaNote")
+
+
+def test_key_moment_is_flagged_and_clicking_it_seeks(page):
+    _load(page, "#loadTrack", TRACK)
+    page.wait_for_function("document.querySelector('#back').hidden === false")
+    _load(page, "#loadPlan", PLAN)
+    page.wait_for_function("document.querySelector('#momCard').hidden === false")
+    text = page.inner_text("#moments")
+    assert "back line" in text and "than planned" in text
+    page.click("#moments button")
+    assert page.evaluate("u") > 0 and not page.errors
+
+
+def test_drawing_tools_add_and_undo_annotations(page):
+    box = page.locator("#c").bounding_box()
+    page.click("[data-tool=pass]")
+    page.mouse.move(box["x"] + 200, box["y"] + 200)
+    page.mouse.down()
+    page.mouse.move(box["x"] + 500, box["y"] + 300, steps=4)
+    page.mouse.up()
+    assert page.evaluate("ann.length") == 1
+    page.click("#undo")
+    assert page.evaluate("ann.length") == 0 and not page.errors
