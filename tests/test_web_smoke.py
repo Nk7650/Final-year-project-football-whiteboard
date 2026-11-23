@@ -200,3 +200,25 @@ def test_motion_module_node_checks():
             "for(let n=3;n<=10;n++){if(M.genForm(n,M.SIZE_FORMS[n]?M.SIZE_FORMS[n][0]:'').length!==n)throw 'size '+n}")
     r = subprocess.run([node, "-e", code], cwd=ROOT, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr
+
+
+def test_cards_remove_player_and_reset_all_clears_everything(page):
+    page.evaluate("selectPlayer(0, 4)")
+    page.click("#evRow [data-ev=y]")
+    assert page.evaluate("prof[0][3].ev.y") == 1 and page.evaluate("visible().some(p => p.team === 0 && p.num === 4)")
+    page.click("#evRow [data-ev=y]")                      # second yellow becomes a red
+    assert page.evaluate("prof[0][3].ev.r") == 1
+    assert not page.evaluate("visible().some(p => p.team === 0 && p.num === 4)")
+    assert "#4" in page.inner_text("#evList")
+    page.once("dialog", lambda d: d.accept())
+    page.click("#resetAll")
+    assert page.evaluate("Object.keys(prof[0][3]).length") == 0 and page.evaluate("frames.length") == 0
+    assert page.evaluate("visible().some(p => p.team === 0 && p.num === 4)")
+    assert not page.errors
+
+
+def test_help_tutorial_opens_and_closes(page):
+    page.click("#helpBtn")
+    assert page.is_visible("#help") and "Set pieces" in page.inner_text("#help")
+    page.keyboard.press("Escape")
+    assert not page.is_visible("#help")

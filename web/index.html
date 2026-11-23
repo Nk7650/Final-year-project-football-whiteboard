@@ -108,6 +108,19 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
 .present #view{height:calc(100vh - 150px)}
 @media(max-width:1100px){main{grid-template-columns:48px minmax(0,1fr)}aside{grid-column:1/-1}}
 @media(max-width:640px){main{grid-template-columns:1fr;padding:10px}#tools{flex-direction:row;flex-wrap:wrap}#dock{grid-template-columns:1fr}}
+.evrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.evrow button{border:1px solid var(--line);background:var(--bg2);border-radius:7px;padding:4px 8px;font-size:11.5px;color:var(--text)}
+.evrow button.y{border-color:#e8c200;color:#ffe45c}.evrow button.r{border-color:#e5484d;color:#ff8b8e}
+.chip-y,.chip-r{display:inline-block;width:9px;height:12px;border-radius:2px;vertical-align:-2px;margin-right:2px}
+.chip-y{background:#ffd60a}.chip-r{background:#e5484d}
+#evList{font-size:12px;line-height:1.7}
+.modal{position:fixed;inset:0;background:rgba(3,6,14,.78);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal[hidden]{display:none}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:820px;width:100%;max-height:90vh;overflow:auto;padding:20px 24px}
+.mbox h2{margin:0 0 4px;font-size:20px}.mbox h4{margin:18px 0 6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.mbox p,.mbox li{font-size:13.5px;line-height:1.55;color:var(--text)}.mbox ul{margin:4px 0;padding-left:20px}
+.mbox kbd{background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px}
+.mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 </style>
 </head>
 <body>
@@ -120,12 +133,14 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
   <button id="addKf" class="hbtn primary">+ Keyframe</button>
   <button id="play2" class="hbtn" aria-label="Play or pause">Play</button>
   <button id="newBoard" class="hbtn">New board</button>
+  <button id="resetAll" class="hbtn" title="Clear the board, drawings, names, profiles, cards, layers and settings">Reset all</button>
   <button id="loadTrack" class="hbtn">Load tracking / video</button>
   <button id="loadPlan" class="hbtn">Load plan overlay</button>
   <button id="exportPlan" class="hbtn">Export plan</button>
   <button id="save" class="hbtn">Save board</button>
   <button id="load" class="hbtn">Load board</button>
   </span>
+  <button id="helpBtn" class="hbtn">Help / tutorial</button>
   <button id="png" class="hbtn">Snapshot PNG</button>
   <button id="presentBtn" class="hbtn">Present</button>
   <input type="file" id="file" accept=".json" hidden>
@@ -243,8 +258,17 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
         </div>
         <label class="f" for="pNote">Scouting note</label><textarea id="pNote" maxlength="240"></textarea>
         <div class="btnrow"><button id="pCarry" class="hbtn">Make ball carrier</button></div>
+        <label class="f">Match events</label>
+        <div class="evrow" id="evRow"><button class="y" data-ev="y">Yellow card</button><button class="r" data-ev="r">Red card</button><button data-ev="g">+ Goal</button><button data-ev="a">+ Assist</button><button data-ev="off">Subbed off</button><button data-ev="inj">Injured</button><button data-ev="clr">Clear events</button></div>
+        <small id="evSum" style="display:block;margin-top:4px"></small>
       </div>
       <div class="note" id="profHint">Click any player on the pitch to open their profile. Names show on the shirt back in 3D.</div>
+    </div>
+
+    <div class="card" id="evCard">
+      <h3>Match events <span style="text-transform:none;letter-spacing:0;font-weight:500">cards, goals, subs</span></h3>
+      <div id="evList"><span class="note">No events yet. Select a player and use the event buttons in their profile.</span></div>
+      <div class="note">A red card (or a second yellow) or a substitution takes the player off the pitch, so you can plan for 10 men. Clear events to bring them back.</div>
     </div>
 
     <div class="card" id="heatCard">
@@ -284,6 +308,7 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
         <label><input type="checkbox" id="showShots" checked> Shot lines</label>
         <label><input type="checkbox" id="showArea" checked> Play area</label>
       </div>
+      <div class="btnrow" style="margin-top:8px"><button id="layersAll" class="hbtn">Show all</button><button id="layersNone" class="hbtn">Clear all layers</button></div>
     </div>
 
     <div class="card" id="pvaBox" hidden>
@@ -318,6 +343,36 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
   </aside>
 </main>
 
+<div class="modal" id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="mbox">
+<div class="mtop"><div><h2 id="helpTitle">How to use Tactics Lab</h2><p style="margin:0;color:var(--mute)">A quick tour of every feature. Press <kbd>?</kbd> any time to reopen this.</p></div><button id="helpClose" class="hbtn">Close</button></div>
+<h4>1. The basics</h4><ul>
+<li><b>Demo match + plan</b> loads a ready-made example so you can see everything working.</li>
+<li><b>Move</b> tool (<kbd>V</kbd>): drag a player or the ball to place them. <b>New board</b> clears the pitch; <b>Reset all</b> clears everything including names, profiles, cards, layers and settings.</li>
+<li>Pick a formation for each team, and a team size from 3v3 to 11v11 (small sizes show a marked play area).</li></ul>
+<h4>2. Making a move (keyframes)</h4><ul>
+<li>Set up the starting positions and press <b>+ Keyframe</b>. Move players, press <b>+ Keyframe</b> again. Repeat for each phase.</li>
+<li>Click a Frame chip to jump back to a phase and edit it. Press <b>Play</b> to watch the players move between keyframes.</li>
+<li>Use the speed menu (0.1x to 4x) or <kbd>[</kbd> and <kbd>]</kbd> to slow down or speed up.</li></ul>
+<h4>3. The ball</h4><ul>
+<li>Select a keyframe that has another one after it, then use the <b>Ball</b> card: <b>Flight</b> (Ground, Lofted, Driven), <b>Draw curve</b> (or tool <kbd>B</kbd>, then click the pitch to bend the pass), <b>Kick animation</b>, and <b>Ball carrier</b> (the ball dribbles with one player).</li>
+<li>These settings only work when the playhead is on a keyframe with a following keyframe.</li></ul>
+<h4>4. 3D view</h4><ul>
+<li>Switch 3D / 2D at the top of the pitch. Choose a camera: Broadcast, Sideline, End, High, Tactical, Orbit, Follow or Drone (<kbd>C</kbd> cycles them).</li>
+<li>Right-drag or Shift-drag to orbit, mouse wheel to zoom. The graphics menu lowers quality on slow computers.</li></ul>
+<h4>5. Drawing tools</h4><ul>
+<li><kbd>R</kbd> run arrow, <kbd>P</kbd> pass arrow, <kbd>H</kbd> shot line, <kbd>Z</kbd> zone, <kbd>S</kbd> spotlight a player, <kbd>T</kbd> text, <kbd>E</kbd> erase. <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes the last drawing; the bin button clears all drawings.</li></ul>
+<h4>6. Set pieces</h4><ul>
+<li>In the Set pieces card choose Corner, Throw-in, Free kick, Goal kick or Penalty, the attacking team and the side, then <b>Build</b>. It creates phase keyframes you can play or edit.</li></ul>
+<h4>7. Player profiles, photos and cards</h4><ul>
+<li>Click a player (or the <b>i</b> button in the lineup) to open their profile: name, position, age, height, foot, nationality, notes and a photo.</li>
+<li><b>Match events</b>: Yellow card, Red card (a second yellow becomes a red), goals, assists, subbed off and injured. They appear on the player's tag and in the Match events list. Red cards and subs remove the player from the pitch.</li></ul>
+<h4>8. Analysis</h4><ul>
+<li><b>Heatmap</b>: tick Show heatmap and choose whose movement to show. <b>Analysis layers</b>: team shape, defensive line, offside line, space control, trails, ball paths, shot lines. The Team shape table gives width, depth and back-line height in metres.</li></ul>
+<h4>9. Replay, plans and files</h4><ul>
+<li><b>Load tracking / video</b> replays real tracking data. <b>Load plan overlay</b> compares it with a planned shape and flags key moments. <b>Export plan</b> saves your keyframes as a plan.</li>
+<li><b>Save board</b> and <b>Load board</b> keep your work as a file. <b>Snapshot PNG</b> saves a picture. <b>Present</b> hides the editing panels for a clean view.</li></ul>
+<h4>Keyboard shortcuts</h4><p><kbd>V</kbd> move, <kbd>R</kbd> run, <kbd>P</kbd> pass, <kbd>H</kbd> shot, <kbd>B</kbd> curve, <kbd>Z</kbd> zone, <kbd>S</kbd> spotlight, <kbd>T</kbd> text, <kbd>E</kbd> erase, <kbd>C</kbd> camera, <kbd>[</kbd> <kbd>]</kbd> speed, <kbd>?</kbd> this help.</p>
+</div></div>
 <script src="vendor/three.min.js"></script>
 <script src="motion.js"></script>
 <script src="stage3d.js"></script>
@@ -431,7 +486,7 @@ function visible() {
   } else {
     list = players;
     if (useTl() && frames.length > 1) { const P0 = Motion.posAt(frames, u); list = players.map((p, k) => ({ ...p, x: P0[k][0], y: P0[k][1] })); }
-    list = list.filter(p => p.num <= SIZE);
+    list = list.filter(p => p.num <= SIZE && !gone(p));
   }
   return on("showAway") ? list : list.filter(p => p.team === 0);
 }
@@ -756,12 +811,12 @@ const imgOf = pr => {
 function tag(p, pos) {
   if (track) return;
   const isSel = !!sel && sel.team === p.team && sel.num === p.num, nm = names[p.team][p.num - 1] || "", pr = prof[p.team][p.num - 1] || {}, img = imgOf(pr);
-  if (!isSel && !(on("showNames") && (nm || pr.photo))) return;
+  if (!isSel && !(on("showNames") && (nm || pr.photo)) && !hasEv(pr)) return;
   const sub = [pr.pos, isSel && pr.age ? pr.age + " yrs" : "", isSel && pr.foot ? pr.foot + " foot" : ""].filter(Boolean).join("  \u00b7  "), label = nm || ("#" + p.num);
   const pic = (img || isSel || nm) ? 32 : 0, h = Math.max(pic ? pic + 6 : 20, sub ? 36 : 20);
   fx.save(); fx.textBaseline = "middle"; fx.textAlign = "left";
   fx.font = `800 12px ${FONT}`; const w1 = fx.measureText(label).width; fx.font = `600 10.5px ${FONT}`; const w2 = sub ? fx.measureText(sub).width : 0;
-  const w = (pic ? pic + 10 : 8) + Math.max(w1, w2) + 12, x0 = Math.round(pos.x - w / 2), y0 = Math.round(pos.topY - h - 9);
+  const evs = evIcons(pr), evW = evs.length ? evs.reduce((q, e) => q + e.w, 0) + 4 : 0, w = (pic ? pic + 10 : 8) + Math.max(w1, w2) + 12 + evW, x0 = Math.round(pos.x - w / 2), y0 = Math.round(pos.topY - h - 9);
   fx.fillStyle = "rgba(5,9,20,.92)"; rr(fx, x0, y0, w, h, 8); fx.fill();
   fx.strokeStyle = isSel ? "#ffffff" : hexA(col(p.team), .9); fx.lineWidth = isSel ? 1.6 : 1; fx.stroke();
   fx.fillStyle = "rgba(5,9,20,.92)"; fx.beginPath(); fx.moveTo(pos.x - 5, y0 + h - .5); fx.lineTo(pos.x + 5, y0 + h - .5); fx.lineTo(pos.x, y0 + h + 6); fx.closePath(); fx.fill();
@@ -775,6 +830,7 @@ function tag(p, pos) {
   const tx = x0 + (pic ? pic + 15 : 10);
   fx.textAlign = "left"; fx.fillStyle = "#fff"; fx.font = `800 12px ${FONT}`; fx.fillText(label, tx, sub ? y0 + h / 2 - 7 : y0 + h / 2 + .5);
   if (sub) { fx.fillStyle = "rgba(255,255,255,.62)"; fx.font = `600 10.5px ${FONT}`; fx.fillText(sub, tx, y0 + h / 2 + 8); }
+  { let ix = x0 + w - evW - 2; for (const e of evs) { e.draw(ix, y0 + h / 2); ix += e.w; } }
   fx.restore();
 }
 function drawDisc(p, gk) {
@@ -1372,11 +1428,11 @@ function paintAvatar() {
 }
 function fillProfile() {
   $("profBody").hidden = !sel; $("profHint").hidden = !!sel;
-  if (!sel) { $("profWho").textContent = "click a player"; return; }
+  if (!sel) { $("profWho").textContent = "click a player"; renderEv(); return; }
   const p = curProf(), t = sel.team, n = sel.num;
   $("profWho").textContent = tname(t) + " #" + n;
   $("pName").value = names[t][n - 1] || ""; $("pPos").value = p.pos || ""; $("pAge").value = p.age || ""; $("pHt").value = p.ht || ""; $("pFoot").value = p.foot || ""; $("pNat").value = p.nat || ""; $("pNote").value = p.note || "";
-  $("pCarry").disabled = segIdx() < 0; paintAvatar();
+  $("pCarry").disabled = segIdx() < 0; paintAvatar(); renderEv();
 }
 $("pName").oninput = () => {
   if (!sel) return; const t = sel.team, n = sel.num; names[t][n - 1] = $("pName").value.trim();
@@ -1523,7 +1579,7 @@ function buildModel(dt) {
     players.forEach((p, k) => arr.push({ team: p.team, num: p.num, x: P0[k][0], y: P0[k][1], vx: moving ? (P1[k][0] - P2[k][0]) / du : 0, vy: moving ? (P1[k][1] - P2[k][1]) / du : 0 }));
   } else players.forEach(p => arr.push({ team: p.team, num: p.num, x: p.x, y: p.y, vx: 0, vy: 0 }));
   if (bst && bst.kicker >= 0 && bst.kick && arr[bst.kicker]) arr[bst.kicker].kick = { type: bst.kick, t: bst.kickT, faceTo: frames[bst.seg + 1][22] };
-  const away = on("showAway"), list = arr.filter(p => (track || p.num <= SIZE) && (away || p.team === 0)), gk = new Set();
+  const away = on("showAway"), list = arr.filter(p => (track || (p.num <= SIZE && !gone(p))) && (away || p.team === 0)), gk = new Set();
   if (!track && SIZE >= 5) for (const t of [0, 1]) { const own = list.filter(p => p.team === t); if (own.length) gk.add(own.reduce((a, c) => (t ? W - c.x : c.x) < (t ? W - a.x : a.x) ? c : a)); }
   for (const p of list) { p.gk = gk.has(p); p.sel = !!sel && sel.team === p.team && sel.num === p.num; p.spot = ann.some(a => a.type === "spot" && a.team === p.team && a.num === p.num); }
   const b = track ? (trackBall ? trackBall : { visible: false, x: W / 2, y: H / 2, z: 0 }) : (bst ? { x: bst.x, y: bst.y, z: bst.z } : { x: ball.x, y: ball.y, z: Motion.BALL_R });
@@ -1564,7 +1620,73 @@ function loop3(ts) {
   raf3 = requestAnimationFrame(loop3);
 }
 
-fillCarrier(); refreshBallCard(); fillProfile(); applySizeInit();
+/* ----- match events (cards etc.) ----- */
+const evOf = pr => pr.ev || {};
+const gone = p => { const e = evOf(prof[p.team][p.num - 1] || {}); return !!(e.r || e.off); };
+const hasEv = pr => { const e = evOf(pr); return !!(e.y || e.r || e.g || e.a || e.off || e.inj); };
+function evIcons(pr) {
+  const e = evOf(pr), out = [], card = c => ({ w: 12, draw: (x, cy) => { fx.fillStyle = c; fx.fillRect(x + 1, cy - 7, 8, 12); fx.strokeStyle = "rgba(0,0,0,.5)"; fx.lineWidth = 1; fx.strokeRect(x + 1.5, cy - 6.5, 7, 11); } });
+  const txt = (t, c) => ({ w: 8 + t.length * 7, draw: (x, cy) => { fx.fillStyle = c; fx.font = `800 11px ${FONT}`; fx.textAlign = "left"; fx.fillText(t, x + 1, cy + .5); } });
+  if (e.y) { out.push(card("#ffd60a")); if (e.y > 1) out.push(card("#ffd60a")); }
+  if (e.r) out.push(card("#e5484d"));
+  if (e.g) out.push(txt("G" + (e.g > 1 ? e.g : ""), "#7be495"));
+  if (e.a) out.push(txt("A" + (e.a > 1 ? e.a : ""), "#7fd0ff"));
+  if (e.off) out.push(txt("OFF", "#ffb347"));
+  if (e.inj) out.push(txt("+", "#ff6b6b"));
+  return out;
+}
+function renderEv() {
+  const box = $("evList"); let html = "";
+  for (const t of [0, 1]) for (let i = 0; i < 11; i++) {
+    const e = evOf(prof[t][i]); if (!hasEv(prof[t][i])) continue;
+    const bits = [];
+    if (e.y) bits.push('<span class="chip-y"></span>'.repeat(e.y)); if (e.r) bits.push('<span class="chip-r"></span>');
+    if (e.g) bits.push("goal" + (e.g > 1 ? " x" + e.g : "")); if (e.a) bits.push("assist" + (e.a > 1 ? " x" + e.a : ""));
+    if (e.off) bits.push("subbed off"); if (e.inj) bits.push("injured");
+    html += `<div><b>${tname(t)} #${i + 1}</b> ${names[t][i] ? names[t][i] + " " : ""}${bits.join(" ")}</div>`;
+  }
+  box.innerHTML = html || '<span class="note">No events yet. Select a player and use the event buttons in their profile.</span>';
+  const s = $("evSum"); if (s && sel) { const e = evOf(curProf()); s.textContent = [e.y ? e.y + " yellow" : "", e.r ? "red card (off the pitch)" : "", e.g ? e.g + " goal" + (e.g > 1 ? "s" : "") : "", e.a ? e.a + " assist" + (e.a > 1 ? "s" : "") : "", e.off ? "subbed off" : "", e.inj ? "injured" : ""].filter(Boolean).join(", ") || "No events for this player."; }
+}
+document.querySelectorAll("#evRow button").forEach(b => b.onclick = () => {
+  if (!sel) return; const pr = curProf(), e = pr.ev = pr.ev || {}, k = b.dataset.ev;
+  if (k === "y") { e.y = Math.min(2, (e.y || 0) + 1); if (e.y >= 2) e.r = 1; }
+  else if (k === "r") e.r = 1;
+  else if (k === "g" || k === "a") e[k] = (e[k] || 0) + 1;
+  else if (k === "off" || k === "inj") e[k] = e[k] ? 0 : 1;
+  else if (k === "clr") pr.ev = {};
+  if (pr.ev && !hasEv(pr)) delete pr.ev;
+  renderEv(); markPaths();
+  if (gone(sel)) $("hint").textContent = "Player is off the pitch. Use Clear events in their profile to bring them back.";
+});
+
+/* ----- reset / layers / help ----- */
+const LAYER_DEFAULT = { showAway: 1, showNames: 1, showRuns: 1, showHull: 0, showLines: 0, showOff: 0, showSpace: 0, showTrails: 0, showPaths: 1, showShots: 1, showArea: 1, showHeat: 0 };
+function setLayers(fn) { for (const id of Object.keys(LAYER_DEFAULT)) $(id).checked = !!fn(id); markPaths(); }
+$("layersAll").onclick = () => setLayers(() => 1);
+$("layersNone").onclick = () => setLayers(() => 0);
+$("resetAll").onclick = () => {
+  if (!confirm("Reset everything? This clears the board, drawings, names, profiles, photos, cards and settings.")) return;
+  playing = false; sel = null; heatSig = "";
+  for (const t of [0, 1]) for (let i = 0; i < 11; i++) { names[t][i] = ""; prof[t][i] = {}; if (S3.ok) S3.setLabel(t, i + 1, ""); }
+  SIZE = 11; $("size").value = 11; populateForms("4-3-3", "4-4-2");
+  setLayers(id => LAYER_DEFAULT[id]); $("heatWho").value = "home"; $("heatPl").value = "all";
+  $("speed").value = "1"; syncVideo(false); setTool("move");
+  if (S3.ok) { S3.setArea(Motion.area(11)); cam3Name = "broadcast"; if (mode3d) S3.setCamera("broadcast"); updateCamButtons(); }
+  clearBoard(); lineup(); fillProfile(); renderEv(); groundDirty = pathsDirty = true;
+  $("hint").textContent = "Everything reset. Blank board, 11 a side, default layers.";
+};
+const helpEl = $("help");
+const toggleHelp = open => { helpEl.hidden = open === undefined ? !helpEl.hidden : !open; if (!helpEl.hidden) $("helpClose").focus(); };
+$("helpBtn").onclick = () => toggleHelp(true); $("helpClose").onclick = () => toggleHelp(false);
+helpEl.addEventListener("click", e => { if (e.target === helpEl) toggleHelp(false); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !helpEl.hidden) { toggleHelp(false); return; }
+  if (e.key === "?" && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) { toggleHelp(); e.preventDefault(); }
+});
+try { if (!navigator.webdriver && !localStorage.getItem("tl_help_seen")) { localStorage.setItem("tl_help_seen", "1"); setTimeout(() => toggleHelp(true), 600); } } catch (_) {}
+
+fillCarrier(); refreshBallCard(); fillProfile(); renderEv(); applySizeInit();
 function applySizeInit() { $("size").value = SIZE; }
 loadDemoMove(); computeMoments(); sizeAll();
 { const m = new URLSearchParams(location.search).get("mode"), want3 = m ? m === "3d" : !navigator.webdriver; if (want3) setTimeout(() => setMode3d(true), 30); }

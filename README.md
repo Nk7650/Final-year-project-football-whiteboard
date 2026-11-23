@@ -29,6 +29,9 @@ Open `web/index.html` (double-click works, no server needed). The board starts i
 - Heatmaps (all / one player, home / away / ball) and shot lines (`H`).
 - Team sizes 3v3 up to 11v11 with a marked play area for small-sided games.
 
+- Match events: yellow and red cards (a second yellow becomes red), goals, assists, subbed off, injured. Red cards and subs take the player off the pitch.
+- Help / tutorial button (or `?`) explains every feature; Reset all clears the board, names, profiles, cards, layers and settings.
+
 Files: `web/stage3d.js` (Three.js scene), `web/motion.js` (ball physics, set pieces, heatmap maths; tested in Node), `web/vendor/three.min.js` (r128).
 
 ## The problem
