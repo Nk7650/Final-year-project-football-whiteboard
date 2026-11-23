@@ -160,6 +160,7 @@ details summary{cursor:pointer;color:var(--mute);font-size:11px;letter-spacing:.
       <h3>Match</h3>
       <div class="teamrow"><input type="color" id="c0" value="#f2c14e" aria-label="Home colour"><input type="text" id="n0" value="Home" aria-label="Home name"><select id="fh" aria-label="Home formation"></select></div>
       <div class="teamrow"><input type="color" id="c1" value="#5fb0e8" aria-label="Away colour"><input type="text" id="n1" value="Away" aria-label="Away name"><select id="fa" aria-label="Away formation"></select></div>
+      <div id="fi" style="font-size:11px;line-height:1.4;opacity:.75;margin-top:6px"></div>
       <div class="chips" style="margin-top:4px">
         <button id="swap" class="hbtn" hidden>Swap teams</button>
         <button id="flip" class="hbtn" hidden>Flip sides</button>
@@ -230,7 +231,35 @@ const FORM = {
   "4-3-3":   [[5,34],[25,10],[25,26],[25,42],[25,58],[50,14],[50,34],[50,54],[78,12],[78,34],[78,56]],
   "4-4-2":   [[5,34],[25,10],[25,26],[25,42],[25,58],[52,8],[52,26],[52,42],[52,60],[78,26],[78,42]],
   "3-5-2":   [[5,34],[24,16],[24,34],[24,52],[45,6],[45,62],[52,20],[52,34],[52,48],[78,26],[78,42]],
-  "4-2-3-1": [[5,34],[25,10],[25,26],[25,42],[25,58],[44,24],[44,44],[62,12],[62,34],[62,56],[80,34]]
+  "4-2-3-1": [[5,34],[25,10],[25,26],[25,42],[25,58],[44,24],[44,44],[62,12],[62,34],[62,56],[80,34]],
+  "4-1-2-1-2": [[5,34],[25,10],[25,26],[25,42],[25,58],[40,34],[52,22],[52,46],[64,34],[80,26],[80,42]],
+  "3-4-3":   [[5,34],[24,16],[24,34],[24,52],[50,8],[50,26],[50,42],[50,60],[78,14],[78,34],[78,54]],
+  "3-4-2-1": [[5,34],[24,16],[24,34],[24,52],[48,8],[48,26],[48,42],[48,60],[64,24],[64,44],[80,34]],
+  "4-2-2-2": [[5,34],[25,10],[25,26],[25,42],[25,58],[42,26],[42,42],[62,20],[62,48],[80,26],[80,42]],
+  "4-1-4-1": [[5,34],[25,10],[25,26],[25,42],[25,58],[40,34],[56,8],[56,26],[56,42],[56,60],[80,34]],
+  "4-4-1-1": [[5,34],[25,10],[25,26],[25,42],[25,58],[52,8],[52,26],[52,42],[52,60],[66,34],[80,34]],
+  "4-5-1":   [[5,34],[25,10],[25,26],[25,42],[25,58],[50,6],[50,20],[50,34],[50,48],[50,62],[80,34]],
+  "5-3-2":   [[5,34],[32,6],[22,20],[22,34],[22,48],[32,62],[50,20],[50,34],[50,48],[78,26],[78,42]],
+  "5-4-1":   [[5,34],[32,6],[22,20],[22,34],[22,48],[32,62],[52,12],[52,26],[52,42],[52,56],[80,34]],
+  "4-3-2-1": [[5,34],[25,10],[25,26],[25,42],[25,58],[48,16],[48,34],[48,52],[64,24],[64,44],[80,34]],
+  "3-2-4-1": [[5,34],[24,18],[24,34],[24,50],[42,26],[42,42],[62,8],[62,26],[62,42],[62,60],[80,34]]
+};
+const FORM_INFO = {
+  "4-4-2": ["Balanced, compact blocks, two strikers", "Easily outnumbered in central midfield"],
+  "4-3-3": ["Possession, high pressing, wide triangles", "Space behind advancing full-backs; isolated holding mid"],
+  "4-2-3-1": ["Double pivot security, flexible attack, midfield control", "Can become static if the number 10 is marked out"],
+  "3-5-2": ["Central midfield overload, two forwards, wing-backs", "Wide flanks exposed when wing-backs push up"],
+  "4-1-2-1-2": ["Heavy central control, strong link play to two strikers", "Vulnerable out wide without disciplined full-back cover"],
+  "3-4-3": ["Extra back-line cover, front-three threat, shifts to 5-4-1", "Demanding wing-back stamina and spacing"],
+  "3-4-2-1": ["Half-space playmakers behind a lone striker", "Wide channels need heavy wing-back work rate"],
+  "4-2-2-2": ["Box midfield, double pivot plus dual attacking mids", "Narrow unless full-backs overlap"],
+  "4-1-4-1": ["Single pivot screening a flat midfield four", "Gap between midfield and lone striker in transitions"],
+  "4-4-1-1": ["Second striker links midfield to the main forward", "Can lack wing speed without wide midfielders"],
+  "4-5-1": ["Compact low/mid-block, counter-attacking structure", "Lone striker can get isolated without late runners"],
+  "5-3-2": ["High defensive solidity, low block, counter-attacks", "Cedes possession and territory"],
+  "5-4-1": ["High defensive solidity, low block, counter-attacks", "Cedes possession and territory"],
+  "4-3-2-1": ["\"Christmas tree\" central compactness, short passing", "Relies heavily on full-backs for width"],
+  "3-2-4-1": ["Modern build-up box / back-three shape, rapid transitions", "Vulnerable to fast counters if possession is lost"]
 };
 const C = { home: "#f2c14e", away: "#5fb0e8" };
 const $ = id => document.getElementById(id);
@@ -250,12 +279,20 @@ for (let t = 0; t < 2; t++) for (let i = 0; i < 11; i++) players.push({ team: t,
 for (const f of [$("fh"), $("fa")]) for (const k in FORM) f.add(new Option(k, k));
 $("fa").value = "4-4-2";
 
+function showInfo() {
+  const t = n => FORM_INFO[n] ? n + " — strength: " + FORM_INFO[n][0] + ". Weakness: " + FORM_INFO[n][1] + "." : "";
+  $("fi").textContent = ""; 
+  [[$("n0").value, $("fh").value], [$("n1").value, $("fa").value]].forEach(([nm, f]) => {
+    const d = document.createElement("div"); d.textContent = nm + " " + t(f); $("fi").appendChild(d);
+  });
+}
 function setFormation(team, name) {
   FORM[name].forEach(([d, y], i) => { const p = players[team * 11 + i]; p.x = team ? W - d : d; p.y = y; });
 }
 setFormation(0, "4-3-3"); setFormation(1, "4-4-2");
-$("fh").onchange = e => { setFormation(0, e.target.value); draw(); };
-$("fa").onchange = e => { setFormation(1, e.target.value); draw(); };
+$("fh").onchange = e => { setFormation(0, e.target.value); showInfo(); draw(); };
+$("fa").onchange = e => { setFormation(1, e.target.value); showInfo(); draw(); };
+$("n0").addEventListener("input", showInfo); $("n1").addEventListener("input", showInfo); showInfo();
 
 /* ---------- small helpers ---------- */
 const snap = () => players.map(p => [p.x, p.y]).concat([[ball.x, ball.y]]);

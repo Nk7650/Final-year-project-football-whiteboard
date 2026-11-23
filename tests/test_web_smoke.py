@@ -146,3 +146,15 @@ def test_demo_move_loads_and_plays_on_a_fresh_page():
         assert 0 < pg.evaluate("u") < 3 and not errors
         _shot(pg, "05-broadcast-view.png")
         browser.close()
+
+
+def test_all_formations_have_eleven_players_on_pitch_and_info(page):
+    bad = page.evaluate("""() => Object.entries(FORM).filter(([k, v]) =>
+        v.length !== 11 || v.some(([d, y]) => d < 0 || d > 100 || y < 0 || y > 68)).map(([k]) => k)""")
+    assert bad == []
+    n = page.evaluate("Object.keys(FORM).length")
+    assert n == 15
+    missing = page.evaluate("Object.keys(FORM).filter(k => !FORM_INFO[k])")
+    assert missing == []
+    page.select_option("#fh", "3-2-4-1")
+    assert "3-2-4-1" in page.inner_text("#fi")
