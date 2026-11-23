@@ -18,7 +18,7 @@ import pytest
 sync_api = pytest.importorskip("playwright.sync_api")
 
 ROOT = Path(__file__).resolve().parent.parent
-PAGE = (ROOT / "web" / "index.html").as_uri()
+PAGE = (ROOT / "web" / "index.html").as_uri() + "?mode=2d"
 TRACK = ROOT / "data" / "sample-tracking.json"
 PLAN = ROOT / "data" / "sample-plan.json"
 IMG = ROOT / "docs" / "img"
@@ -140,10 +140,10 @@ def test_demo_move_loads_and_plays_on_a_fresh_page():
         errors = []
         pg.on("pageerror", lambda e: errors.append(str(e)))
         pg.goto(PAGE)
-        assert pg.evaluate("frames.length") == 4          # the demo move is ready before the user does anything
+        assert pg.evaluate("frames.length") == 5          # the demo move is ready before the user does anything
         pg.click("#play")
         pg.wait_for_timeout(900)
-        assert 0 < pg.evaluate("u") < 3 and not errors
+        assert 0 < pg.evaluate("u") < 4 and not errors
         _shot(pg, "05-broadcast-view.png")
         browser.close()
 
@@ -158,3 +158,45 @@ def test_all_formations_have_eleven_players_on_pitch_and_info(page):
     assert missing == []
     page.select_option("#fh", "3-2-4-1")
     assert "3-2-4-1" in page.inner_text("#fi")
+
+
+def test_team_sizes_3_to_11_build_valid_boards(page):
+    for n in range(3, 12):
+        page.select_option("#size", str(n))
+        assert page.evaluate("players.filter(p => p.num <= SIZE).length") == 2 * n
+        bad = page.evaluate("players.filter(p => p.num <= SIZE && (isNaN(p.x) || p.x < 0 || p.x > 105 || p.y < 0 || p.y > 68)).length")
+        assert bad == 0
+    assert not page.errors
+
+
+def test_set_pieces_build_phases_for_every_kind(page):
+    for kind in ["corner", "throw", "free", "goalkick", "penalty"]:
+        page.select_option("#spKind", kind)
+        page.click("#spBuild")
+        assert page.evaluate("frames.length") >= 3 and page.evaluate("segs.length") == page.evaluate("frames.length") - 1
+    assert not page.errors
+
+
+def test_ball_flight_kick_and_heatmap_controls(page):
+    page.evaluate("loadDemoMove()")
+    page.click("#chips button >> nth=0")
+    page.click("#flightSeg [data-flight=lofted]")
+    page.click("#kickSeg [data-kick=header]")
+    assert page.evaluate("segs[0].flight") == "lofted" and page.evaluate("segs[0].kick") == "header"
+    page.evaluate("document.querySelector('#showHeat').checked = true; document.querySelector('#showHeat').dispatchEvent(new Event('change'))")
+    assert not page.errors
+
+
+def test_motion_module_node_checks():
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("node not available")
+    import subprocess
+    code = ("const M=require('./web/motion.js');"
+            "const f=[Array.from({length:23},(_,i)=>[10+i,20]),Array.from({length:23},(_,i)=>[30+i,20])];"
+            "const s=[Object.assign(M.defaultSeg(),{flight:'lofted'})];"
+            "const mid=M.ballState(f,s,.5);if(!(mid.z>0.5))throw 'lofted ball must rise';"
+            "const g=M.ballState(f,[M.defaultSeg()],.5);if(g.z>0.5)throw 'ground ball must stay low';"
+            "for(let n=3;n<=10;n++){if(M.genForm(n,M.SIZE_FORMS[n]?M.SIZE_FORMS[n][0]:'').length!==n)throw 'size '+n}")
+    r = subprocess.run([node, "-e", code], cwd=ROOT, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr

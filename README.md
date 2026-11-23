@@ -17,6 +17,20 @@ A web tactics board where a coach plans formations and pressing as animated keyf
 
 "Space owned" is the share of pitch closer to each team's nearest player. It is a simple proxy and is not the published pitch-control model.
 
+## 3D stadium mode (new)
+
+Open `web/index.html` (double-click works, no server needed). The board starts in the 3D stadium; use the 3D / 2D switch to change.
+
+- Cameras: Broadcast, Sideline, End, High, Tactical, Orbit, Follow, Drone. Right-drag or Shift-drag to orbit, wheel to zoom, `C` cycles cameras.
+- Ball: Ground / Lofted / Driven flight, curved paths (Draw Curve tool, `B`), ball carrier, and kick animations (pass, shot, header, throw-in). Select a keyframe first; these apply to the segment that follows it.
+- Players: run, idle, goalkeeper and kick animation. Click a player for a profile (name, position, age, height, foot, nationality, notes, photo).
+- Playback speed 0.1x to 4x (`[` and `]`).
+- Set pieces: corners, throw-ins, free kicks, goal kicks and penalties, built as phase keyframes for either team and side.
+- Heatmaps (all / one player, home / away / ball) and shot lines (`H`).
+- Team sizes 3v3 up to 11v11 with a marked play area for small-sided games.
+
+Files: `web/stage3d.js` (Three.js scene), `web/motion.js` (ball physics, set pieces, heatmap maths; tested in Node), `web/vendor/three.min.js` (r128).
+
 ## The problem
 
 Amateur and university teams plan tactics on whiteboards and review matches by re-watching video. Professional analytics platforms do much more but are costly and closed. There is little low-cost tooling that connects a coach's plan to what actually happened. This project builds that link and, importantly, **measures how well it works**: tracking accuracy against hand annotation, agreement with coaches' judgement of key moments, and usability. See [docs/RESEARCH.md](docs/RESEARCH.md).
