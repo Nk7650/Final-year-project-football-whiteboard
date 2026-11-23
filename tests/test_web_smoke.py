@@ -170,6 +170,7 @@ def test_team_sizes_3_to_11_build_valid_boards(page):
 
 
 def test_set_pieces_build_phases_for_every_kind(page):
+    page.click("#tabbar [data-tab=moves]")
     for kind in ["corner", "throw", "free", "goalkick", "penalty"]:
         page.select_option("#spKind", kind)
         page.click("#spBuild")
@@ -179,6 +180,7 @@ def test_set_pieces_build_phases_for_every_kind(page):
 
 def test_ball_flight_kick_and_heatmap_controls(page):
     page.evaluate("loadDemoMove()")
+    page.click("#tabbar [data-tab=moves]")
     page.click("#chips button >> nth=0")
     page.click("#flightSeg [data-flight=lofted]")
     page.click("#kickSeg [data-kick=header]")
@@ -222,3 +224,12 @@ def test_help_tutorial_opens_and_closes(page):
     assert page.is_visible("#help") and "Set pieces" in page.inner_text("#help")
     page.keyboard.press("Escape")
     assert not page.is_visible("#help")
+
+
+def test_bottom_tabs_show_one_group_at_a_time(page):
+    page.click("#tabbar [data-tab=analysis]")
+    assert page.is_visible("#heatCard") and not page.is_visible("#ballCard")
+    page.click("#tabbar [data-tab=players]")
+    assert page.is_visible("#profCard") and not page.is_visible("#heatCard")
+    page.click("#tabbar [data-tab=players]")              # clicking the active tab collapses the panel
+    assert not page.is_visible("#profCard")

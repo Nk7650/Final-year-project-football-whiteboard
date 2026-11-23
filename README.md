@@ -32,6 +32,9 @@ Open `web/index.html` (double-click works, no server needed). The board starts i
 - Match events: yellow and red cards (a second yellow becomes red), goals, assists, subbed off, injured. Red cards and subs take the player off the pitch.
 - Help / tutorial button (or `?`) explains every feature; Reset all clears the board, names, profiles, cards, layers and settings.
 
+- Bottom tab bar (Match, Moves, Players, Analysis, Replay) shows one group of panels at a time; click the active tab to hide the side panel. Buttons flash on click and a short message pops up when something is done.
+- Neon red theme with a stadium background (`web/img/bg.jpg`).
+
 Files: `web/stage3d.js` (Three.js scene), `web/motion.js` (ball physics, set pieces, heatmap maths; tested in Node), `web/vendor/three.min.js` (r128).
 
 ## The problem
