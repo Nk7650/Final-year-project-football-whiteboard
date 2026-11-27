@@ -233,3 +233,38 @@ def test_bottom_tabs_show_one_group_at_a_time(page):
     assert page.is_visible("#profCard") and not page.is_visible("#heatCard")
     page.click("#tabbar [data-tab=players]")              # clicking the active tab collapses the panel
     assert not page.is_visible("#profCard")
+
+
+def test_goal_scores_updates_clock_and_summary(page):
+    page.evaluate("loadDemoMove()")
+    page.evaluate("u = 3.0; playing = true; tlMode = true; lastTs = performance.now(); requestAnimationFrame(tick)")
+    page.wait_for_function("matchLog.length > 0", timeout=6000)
+    assert page.inner_text("#hs0") == "1" and page.evaluate("matchLog[0].num") is not None
+    page.click("#endMatch")
+    assert page.is_visible("#summary") and "player of the match" in page.inner_text("#sPotm").lower()
+    page.click("#sVote button >> nth=0")
+    assert page.evaluate("Object.values(votes).reduce((a, b) => a + b, 0)") == 1
+    page.click("#sClose")
+    assert not page.errors
+
+
+def test_match_clock_added_time_and_half_time(page):
+    page.fill("#add1", "2")
+    page.select_option("#clkRate", "180")
+    page.evaluate("mc.sec = 2699; mc.extra = 0; mc.half = 1")
+    page.click("#clkGo")
+    page.wait_for_function("mc.sec >= 2700 && mc.extra > 0", timeout=4000)
+    assert "45+" in page.inner_text("#hmin")
+    page.wait_for_function("mc.half === 'HT'", timeout=4000)
+    assert page.inner_text("#hper").lower() == "half time"
+
+
+def test_follow_picker_and_formation_preview(page):
+    page.evaluate("setMode3d(false)")
+    page.select_option("#fh", "3-5-2")
+    page.wait_for_timeout(700)
+    assert page.evaluate("document.getElementById('fvis').width") > 0
+    page.evaluate("openFollow()")
+    assert page.is_visible("#followDlg") and page.locator("#fList button").count() == 22
+    page.click("#fBall")
+    assert page.evaluate("followT.kind") == "ball" and not page.errors

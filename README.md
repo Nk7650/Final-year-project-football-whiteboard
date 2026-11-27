@@ -35,6 +35,9 @@ Open `web/index.html` (double-click works, no server needed). The board starts i
 - Bottom tab bar (Match, Moves, Players, Analysis, Replay) shows one group of panels at a time; click the active tab to hide the side panel. Buttons flash on click and a short message pops up when something is done.
 - Neon red theme with a stadium background (`web/img/bg.jpg`).
 
+- Match clock 0-90 with added time, half-time pause, and goal detection: when the ball crosses the line the board shows a GOAL banner, confetti, a synthesised crowd roar (Sound button) and updates the score. Scorers get a celebration pose in 3D.
+- Follow camera picker (the ball or any player), formation preview with players gliding into shape, and an End match screen with data-based player of the match, team stats, fans' vote and CSV export.
+
 Files: `web/stage3d.js` (Three.js scene), `web/motion.js` (ball physics, set pieces, heatmap maths; tested in Node), `web/vendor/three.min.js` (r128).
 
 ## The problem

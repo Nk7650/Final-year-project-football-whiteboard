@@ -147,6 +147,59 @@ button:active:not(:disabled),.layers label:active{transform:scale(.94)}
 #toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,16px);z-index:60;max-width:min(560px,90vw);padding:9px 16px;border-radius:12px;background:rgba(24,5,12,.95);border:1px solid var(--accent);box-shadow:var(--glow);color:#fff;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---- v4: tooltip fix, slick tabs, HUD, goal fx, dialogs ---- */
+#tools{position:relative;z-index:30}
+.tool[data-tip]:hover::after{z-index:60}
+#tabbar button{position:relative;z-index:1;background:transparent!important;border-color:transparent!important;box-shadow:none!important;transition:color .25s,transform .25s}
+#tabbar button.on{color:#fff}
+#tabbar button.on svg{animation:iconpop .5s cubic-bezier(.3,1.6,.5,1)}
+#tabbar button:hover svg{transform:translateY(-2px)}
+#tabbar button svg{transition:transform .25s}
+#tabbar .ind{position:absolute;top:6px;bottom:6px;left:0;width:64px;border-radius:14px;background:linear-gradient(180deg,#ff3b63,#b30f2c);border:1px solid #ff8fa5;box-shadow:var(--glow),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .42s cubic-bezier(.3,1.35,.5,1),width .3s;z-index:0;pointer-events:none}
+@keyframes iconpop{0%{transform:scale(.6) rotate(-12deg)}60%{transform:scale(1.25) rotate(4deg)}100%{transform:none}}
+@keyframes slidein{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+aside[data-tab]>.card{animation-duration:.42s;animation-timing-function:cubic-bezier(.2,.9,.25,1)}
+#hud{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:4;display:flex;align-items:stretch;border-radius:12px;overflow:hidden;background:rgba(14,3,9,.88);border:1px solid var(--accent);box-shadow:var(--glow);font-weight:800;backdrop-filter:blur(6px)}
+#hud .hteam{display:flex;align-items:center;gap:10px;padding:6px 14px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-bottom:3px solid var(--c,#fff)}
+#hud .hteam b{font-size:22px;min-width:16px;text-align:center}
+#hud #hclock{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 14px;background:rgba(255,42,85,.18);min-width:82px}
+#hud #hmin{font:800 18px/1 ui-monospace,Menlo,Consolas,monospace}
+#hud #hper{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700}
+#hud.run #hmin{color:#ff6b88;text-shadow:0 0 10px rgba(255,42,85,.8)}
+#goalFx{position:absolute;inset:0;z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(255,42,85,.38),transparent 62%)}
+#goalFx .gbig{font:900 clamp(56px,12vw,150px)/1 var(--font);letter-spacing:.06em;color:#fff;text-shadow:0 0 18px #ff2a55,0 0 46px #ff2a55,0 0 90px #ff2a55;animation:gbig 3.2s cubic-bezier(.2,1.4,.4,1) both}
+#goalFx .gwho{margin-top:8px;padding:6px 18px;border-radius:999px;background:rgba(14,3,9,.9);border:1px solid var(--accent);font-weight:700;font-size:18px;box-shadow:var(--glow);animation:gwho 3.2s ease both}
+@keyframes gbig{0%{transform:scale(.2) rotate(-8deg);opacity:0}14%{transform:scale(1.18) rotate(2deg);opacity:1}24%{transform:scale(1)}80%{opacity:1}100%{transform:scale(1.15);opacity:0}}
+@keyframes gwho{0%,15%{transform:translateY(30px);opacity:0}28%{transform:none;opacity:1}82%{opacity:1}100%{opacity:0}}
+#confetti{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+#view.shake{animation:vshake .6s}
+@keyframes vshake{0%,100%{transform:none}15%{transform:translate(-6px,3px)}30%{transform:translate(5px,-4px)}45%{transform:translate(-4px,-3px)}60%{transform:translate(4px,3px)}80%{transform:translate(-2px,1px)}}
+#followTag{position:absolute;left:12px;bottom:12px;z-index:4;padding:5px 12px;border-radius:999px;background:rgba(14,3,9,.9);border:1px solid var(--accent);font-size:12px;box-shadow:var(--glow);cursor:pointer}
+#fvis{width:100%;height:auto;border-radius:10px;margin-top:8px;border:1px solid var(--line);display:block}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:10px}
+.fgrid button{display:flex;gap:8px;align-items:center;text-align:left;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:12.5px;color:var(--text)}
+.fgrid button:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.fgrid button b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;color:#111;flex:none}
+.bigbtn{width:100%;padding:12px;border-radius:12px;font-weight:800;font-size:14px;border:1px solid #ff8fa5;background:linear-gradient(180deg,#ff3b63,#b30f2c);color:#fff;box-shadow:var(--glow);margin:6px 0}
+.sbox{max-width:1080px}
+.sgrid{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin-top:14px}
+@media(max-width:860px){.sgrid{grid-template-columns:1fr}}
+.potm{display:flex;gap:16px;align-items:center;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(255,42,85,.28),rgba(255,178,58,.12));border:1px solid var(--accent);box-shadow:var(--glow)}
+.potm .pic{width:96px;height:96px;border-radius:50%;border:3px solid var(--accent);background:var(--bg2) center/cover;display:grid;place-items:center;font:800 34px var(--font);flex:none;box-shadow:var(--glow)}
+.potm h3{margin:0;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--warn)}
+.potm .nm{font-size:24px;font-weight:800;margin:2px 0}
+.potm .rt{font:900 40px/1 var(--font);color:#fff;text-shadow:0 0 16px #ff2a55;margin-left:auto}
+.chipline{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chipline span{font-size:12px;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid var(--line)}
+.rrow{display:grid;grid-template-columns:22px 1fr 44px;gap:8px;align-items:center;margin:5px 0;font-size:13px}
+.rrow .bar3{height:8px;border-radius:5px;background:rgba(0,0,0,.4);overflow:hidden}.rrow .bar3 i{display:block;height:100%;background:linear-gradient(90deg,#ff2a55,#ffb23a);box-shadow:0 0 8px #ff2a55}
+.stbl{width:100%;font-size:13px}.stbl td{padding:6px 4px}.stbl td.m{text-align:center;color:var(--mute);font-size:12px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:8px}
+.vcard{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+.vcard.lead{border-color:var(--warn);box-shadow:0 0 14px rgba(255,194,51,.4)}
+.vcard .vb{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#111;font-weight:800;font-size:12px;background-size:cover;background-position:center;flex:none}
+.vcard button{margin-left:auto;padding:4px 10px;border-radius:8px;border:1px solid var(--accent);background:rgba(255,42,85,.18);font-size:12px;font-weight:700}
+.vcard .vn{min-width:0;font-size:12.5px;line-height:1.2}.vcard .vn small{display:block;color:var(--mute);font-size:10.5px}
+.vcard .vc{font-weight:800;color:var(--warn);min-width:18px;text-align:right}
 </style>
 </head>
 <body>
@@ -166,6 +219,8 @@ button:active:not(:disabled),.layers label:active{transform:scale(.94)}
   <button id="save" class="hbtn">Save board</button>
   <button id="load" class="hbtn">Load board</button>
   </span>
+  <button id="endMatch" class="hbtn demo hide-present" title="Finish the match and see ratings, best player and stats">End match</button>
+  <button id="sndBtn" class="hbtn" title="Crowd sound on / off">Sound on</button>
   <button id="helpBtn" class="hbtn">Help / tutorial</button>
   <button id="png" class="hbtn">Snapshot PNG</button>
   <button id="presentBtn" class="hbtn">Present</button>
@@ -206,6 +261,9 @@ button:active:not(:disabled),.layers label:active{transform:scale(.94)}
           <button data-view="top">Tactical</button>
         </div>
       </div>
+      <div id="hud"><div class="hteam" id="ht0"><span id="hn0">Home</span><b id="hs0">0</b></div><div id="hclock"><span id="hmin">00:00</span><small id="hper">1st half</small></div><div class="hteam" id="ht1"><b id="hs1">0</b><span id="hn1">Away</span></div></div>
+      <canvas id="confetti"></canvas><div id="goalFx" hidden><div class="gbig">GOAL!</div><div class="gwho" id="gwho"></div></div>
+      <div id="followTag" hidden></div>
       <input id="txtIn" type="text" placeholder="Type, press Enter" hidden>
     </div>
     <video id="vid" controls muted playsinline hidden></video>
@@ -231,6 +289,7 @@ button:active:not(:disabled),.layers label:active{transform:scale(.94)}
       <div class="teamrow"><input type="color" id="c1" value="#5fb0e8" aria-label="Away colour"><input type="text" id="n1" value="Away" aria-label="Away name"><select id="fa" aria-label="Away formation"></select></div>
       <label class="f" for="size">Players per side</label>
       <select id="size" aria-label="Players per side"><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option selected>11</option></select>
+      <canvas id="fvis" width="520" height="270" aria-label="Formation preview"></canvas>
       <div id="fi" style="font-size:11px;line-height:1.4;opacity:.75;margin-top:6px"></div>
       <div class="chips" style="margin-top:4px">
         <button id="swap" class="hbtn" hidden>Swap teams</button>
@@ -239,6 +298,17 @@ button:active:not(:disabled),.layers label:active{transform:scale(.94)}
       </div>
     </div>
 
+
+    <div class="card" id="clockCard" data-tab="match">
+      <h3>Match clock <span id="clkLab" style="text-transform:none;letter-spacing:0;font-weight:500">0 - 90 min</span></h3>
+      <div class="btnrow" style="margin:0 0 6px"><button id="clkGo" class="hbtn primary">Start</button><button id="clkReset" class="hbtn">Reset</button><button id="goalH" class="hbtn">+ Home goal</button><button id="goalA" class="hbtn">+ Away goal</button></div>
+      <label class="f" for="clkMin">Jump to minute <b id="clkMinV">0</b></label><input type="range" id="clkMin" min="0" max="90" value="0" step="1">
+      <div class="grid2"><div><label class="f" for="clkRate">Clock speed</label><select id="clkRate"><option value="1">Real time</option><option value="10">10x</option><option value="60" selected>1 min per second</option><option value="180">3 min per second</option></select></div>
+        <div><label class="f" for="add1">Added time (min)</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input type="number" id="add1" min="0" max="15" value="0" title="1st half" aria-label="Added time first half"><input type="number" id="add2" min="0" max="20" value="0" title="2nd half" aria-label="Added time second half"></div></div></div>
+      <div class="note">Left box: added time after 45. Right box: added time after 90. The clock pauses at half time and full time.</div>
+      <div id="goalLog" class="note" style="margin-top:6px"></div>
+      <button id="endMatch2" class="bigbtn">End match and see the stats</button>
+    </div>
 
     <div class="card" id="ballCard" data-tab="moves">
       <h3>Ball path <span id="segLabel" style="text-transform:none;letter-spacing:0;font-weight:500"></span></h3>
@@ -374,7 +444,7 @@ button:active:not(:disabled),.layers label:active{transform:scale(.94)}
     </div>
   </aside>
 </main>
-<nav id="tabbar" aria-label="Panels">
+<nav id="tabbar" aria-label="Panels"><i class="ind"></i>
   <button data-tab="match" class="on" aria-label="Match setup"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.5 5h-5L8 10z"/></svg>Match</button>
   <button data-tab="moves" aria-label="Moves, ball and set pieces"><svg viewBox="0 0 24 24"><path d="M4 18c4-10 9-11 15-9"/><path d="M15 5l4 4-4 4"/><circle cx="4" cy="18" r="1.6"/></svg>Moves</button>
   <button data-tab="players" aria-label="Players and cards"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg>Players</button>
@@ -411,7 +481,24 @@ button:active:not(:disabled),.layers label:active{transform:scale(.94)}
 <h4>9. Replay, plans and files</h4><ul>
 <li><b>Load tracking / video</b> replays real tracking data. <b>Load plan overlay</b> compares it with a planned shape and flags key moments. <b>Export plan</b> saves your keyframes as a plan.</li>
 <li><b>Save board</b> and <b>Load board</b> keep your work as a file. <b>Snapshot PNG</b> saves a picture. <b>Present</b> hides the editing panels for a clean view.</li></ul>
+<h4>10. Match clock, goals and the final whistle</h4><ul>
+<li>The <b>Match clock</b> (Match tab) runs 0 to 90 minutes with optional added time after each half. It pauses at half time and full time. Drag the slider to jump to any minute.</li>
+<li>When the ball crosses the goal line during a move, the board celebrates (GOAL banner, confetti, crowd roar) and updates the score. You can also press <b>+ Goal</b> on a player's profile or the + Home / + Away goal buttons. The Sound button turns the crowd on or off.</li>
+<li>In 3D, press <b>Follow</b> to choose the ball or any player for the camera to follow.</li>
+<li><b>End match</b> opens the full-time screen: score, goals, the best player based on the data, team stats, and a fans' vote you can run by tapping Vote on each player.</li></ul>
 <h4>Keyboard shortcuts</h4><p><kbd>V</kbd> move, <kbd>R</kbd> run, <kbd>P</kbd> pass, <kbd>H</kbd> shot, <kbd>B</kbd> curve, <kbd>Z</kbd> zone, <kbd>S</kbd> spotlight, <kbd>T</kbd> text, <kbd>E</kbd> erase, <kbd>C</kbd> camera, <kbd>[</kbd> <kbd>]</kbd> speed, <kbd>?</kbd> this help.</p>
+</div></div>
+<div class="modal" id="followDlg" hidden role="dialog" aria-modal="true" aria-labelledby="fTitle"><div class="mbox" style="max-width:560px">
+<div class="mtop"><div><h2 id="fTitle">What should the camera follow?</h2><p style="margin:0;color:var(--mute)">Pick the ball or any player.</p></div><button id="fClose" class="hbtn">Close</button></div>
+<button class="bigbtn" id="fBall">Follow the ball (close-up)</button>
+<button class="hbtn" id="fAuto" style="width:100%;justify-content:center">Auto: whoever has the ball</button>
+<div class="fgrid" id="fList"></div></div></div>
+<div class="modal" id="summary" hidden role="dialog" aria-modal="true" aria-labelledby="sTitle"><div class="mbox sbox">
+<div class="mtop"><div><h2 id="sTitle">Full time</h2><p id="sScore" style="margin:0;font-size:18px;font-weight:700"></p><p id="sGoals" style="margin:2px 0 0;color:var(--mute);font-size:13px"></p></div>
+<div class="btnrow" style="margin:0"><button id="sCsv" class="hbtn">Download stats (CSV)</button><button id="sClose" class="hbtn primary">Back to board</button></div></div>
+<div class="sgrid"><div><div id="sPotm"></div><h4>Top rated</h4><div id="sTop"></div><div class="note" id="sNote"></div></div>
+<div><h4 style="margin-top:0">Team stats</h4><div id="sTeam"></div></div></div>
+<h4>Fans' vote: who was best?</h4><div class="mtop" style="align-items:center"><p id="vLead" style="margin:0"></p><button id="vReset" class="hbtn">Reset votes</button></div><div class="vgrid" id="sVote"></div>
 </div></div>
 <script src="vendor/three.min.js"></script>
 <script src="motion.js"></script>
@@ -492,8 +579,8 @@ function setFormation(team, name) {
   (formFor(name) || formFor(formNames()[0])).forEach(([d, y], i) => { const p = players[team * 11 + i]; p.x = team ? W - d : d; p.y = y; });
 }
 setFormation(0, "4-3-3"); setFormation(1, "4-4-2");
-$("fh").onchange = e => { setFormation(0, e.target.value); showInfo(); draw(); };
-$("fa").onchange = e => { setFormation(1, e.target.value); showInfo(); draw(); };
+$("fh").onchange = e => { glideFormation(0, e.target.value); showInfo(); };
+$("fa").onchange = e => { glideFormation(1, e.target.value); showInfo(); };
 $("n0").addEventListener("input", showInfo); $("n1").addEventListener("input", showInfo); showInfo();
 
 /* ---------- small helpers ---------- */
@@ -1230,6 +1317,7 @@ function tick(ts) {
   if (!playing) return;
   const dt = Math.max(0, (ts - lastTs) / 1000) * speed(); lastTs = ts;
   u = Math.max(0, u + (track ? dt * track.fps : dt / 1.6));
+  if (!track) checkGoal();
   if (track && !vid.hidden && Math.abs(vid.currentTime - tAt()) > .35) vid.currentTime = tAt();
   if (u >= length()) {
     u = length(); playing = false; setPlayLabel();
@@ -1268,7 +1356,7 @@ const pick = kind => {
 };
 const download = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); };
 $("save").onclick = () => download(new Blob([JSON.stringify({
-  version: 4, size: SIZE, segs, frameNames, prof: prof.map(a => a.map(o => { const { _img, ...r } = o; return r; })), frames, players: snap().slice(0, 22), ann, ball, names, teams: { n: [tname(0), tname(1)], c: [C.home, C.away], f: [$("fh").value, $("fa").value] } })], { type: "application/json" }), "tactics-board.json");
+  version: 5, log: matchLog, votes, clock: { sec: mc.sec, extra: mc.extra, half: mc.half, a1: +$("add1").value, a2: +$("add2").value }, size: SIZE, segs, frameNames, prof: prof.map(a => a.map(o => { const { _img, ...r } = o; return r; })), frames, players: snap().slice(0, 22), ann, ball, names, teams: { n: [tname(0), tname(1)], c: [C.home, C.away], f: [$("fh").value, $("fa").value] } })], { type: "application/json" }), "tactics-board.json");
 $("load").onclick = () => pick("board");
 $("loadTrack").onclick = () => pick("track");
 $("loadPlan").onclick = () => pick("plan");
@@ -1294,6 +1382,7 @@ $("file").onchange = async e => {
       useTrack(d); $("hint").textContent = "Tracking replay: " + d.frames.length + " frames at " + d.fps + " fps.";
     } else {
       if (d.size && d.size !== SIZE) { SIZE = d.size; $("size").value = SIZE; populateForms(); if (S3.ok) S3.setArea(Motion.area(SIZE)); }
+      matchLog = d.log || []; votes = d.votes || {}; if (d.clock) { Object.assign(mc, { sec: d.clock.sec || 0, extra: d.clock.extra || 0, half: d.clock.half || 1, run: false }); $("add1").value = d.clock.a1 || 0; $("add2").value = d.clock.a2 || 0; } renderScore(); clockUI();
       segs = d.segs || []; frameNames = d.frameNames || []; if (d.prof) d.prof.forEach((a, t) => a.forEach((o, i) => { prof[t][i] = o || {}; })); kfVersion++;
       frames = d.frames || []; syncSegs(); (d.players || []).forEach(([x, y], k) => { players[k].x = x; players[k].y = y; }); cur = -1;
       ann = d.ann || []; if (d.ball) ball = d.ball;
@@ -1600,8 +1689,8 @@ function setMode3d(want) {
   else { if (raf3) cancelAnimationFrame(raf3); raf3 = 0; fx.clearRect(0, 0, VW, VH); sizeAll(); }
 }
 window.set3D = setMode3d;
-function updateCamButtons() { if (!S3.ok) return; const m = S3.cameraMode(); document.querySelectorAll("#cam3 button").forEach(b => b.classList.toggle("on", b.dataset.cam === m)); }
-document.querySelectorAll("#cam3 button").forEach(b => b.onclick = () => { cam3Name = b.dataset.cam; S3.setCamera(cam3Name); updateCamButtons(); });
+function updateCamButtons() { if (!S3.ok) return; const m = S3.cameraMode(); document.querySelectorAll("#cam3 button").forEach(b => b.classList.toggle("on", b.dataset.cam === (m === "ballcam" ? "follow" : m))); }
+document.querySelectorAll("#cam3 button").forEach(b => b.onclick = () => { if (b.dataset.cam === "follow") { openFollow(); return; } cam3Name = b.dataset.cam; S3.setCamera(cam3Name); updateCamButtons(); });
 document.querySelectorAll("#modeBar button").forEach(b => b.onclick = () => setMode3d(b.dataset.mode === "3d"));
 $("gfx").onchange = e => { if (S3.ok) S3.setQuality(e.target.value); };
 function buildModel(dt) {
@@ -1623,7 +1712,7 @@ function buildModel(dt) {
   if (!track && SIZE >= 5) for (const t of [0, 1]) { const own = list.filter(p => p.team === t); if (own.length) gk.add(own.reduce((a, c) => (t ? W - c.x : c.x) < (t ? W - a.x : a.x) ? c : a)); }
   for (const p of list) { p.gk = gk.has(p); p.sel = !!sel && sel.team === p.team && sel.num === p.num; p.spot = ann.some(a => a.type === "spot" && a.team === p.team && a.num === p.num); }
   const b = track ? (trackBall ? trackBall : { visible: false, x: W / 2, y: H / 2, z: 0 }) : (bst ? { x: bst.x, y: bst.y, z: bst.z } : { x: ball.x, y: ball.y, z: Motion.BALL_R });
-  let fIdx; if (sel) fIdx = sel.team * 11 + sel.num - 1; else if (bst && bst.carrier !== null) fIdx = bst.carrier; else if (bst && bst.kicker >= 0) fIdx = bst.kicker;
+  let fIdx; if (followT.kind === "player") fIdx = followT.team * 11 + followT.num - 1; else if (sel) fIdx = sel.team * 11 + sel.num - 1; else if (bst && bst.carrier !== null) fIdx = bst.carrier; else if (bst && bst.kicker >= 0) fIdx = bst.kicker;
   else { let bd = 1e9; for (const p of list) { const d = Math.hypot(p.x - b.x, p.y - b.y); if (d < bd) { bd = d; fIdx = p.team * 11 + p.num - 1; } } }
   return { list, model: { players: list, ball: b, animDt: moving ? dt * speed() : 0, followIdx: fIdx } };
 }
@@ -1692,9 +1781,10 @@ document.querySelectorAll("#evRow button").forEach(b => b.onclick = () => {
   if (!sel) return; const pr = curProf(), e = pr.ev = pr.ev || {}, k = b.dataset.ev;
   if (k === "y") { e.y = Math.min(2, (e.y || 0) + 1); if (e.y >= 2) e.r = 1; }
   else if (k === "r") e.r = 1;
-  else if (k === "g" || k === "a") e[k] = (e[k] || 0) + 1;
+  else if (k === "g") { registerGoal(sel.team, sel.num, "manual"); return; }
+  else if (k === "a") e[k] = (e[k] || 0) + 1;
   else if (k === "off" || k === "inj") e[k] = e[k] ? 0 : 1;
-  else if (k === "clr") pr.ev = {};
+  else if (k === "clr") { pr.ev = {}; matchLog = matchLog.filter(g => !(g.team === sel.team && g.num === sel.num)); renderScore(); }
   if (pr.ev && !hasEv(pr)) delete pr.ev;
   renderEv(); markPaths();
   if (gone(sel)) $("hint").textContent = "Player is off the pitch. Use Clear events in their profile to bring them back.";
@@ -1707,7 +1797,7 @@ $("layersAll").onclick = () => setLayers(() => 1);
 $("layersNone").onclick = () => setLayers(() => 0);
 $("resetAll").onclick = () => {
   if (!confirm("Reset everything? This clears the board, drawings, names, profiles, photos, cards and settings.")) return;
-  playing = false; sel = null; heatSig = "";
+  playing = false; sel = null; heatSig = ""; matchLog = []; votes = {}; Object.assign(mc, { sec: 0, extra: 0, half: 1, run: false }); $("add1").value = 0; $("add2").value = 0; followT = { kind: "auto" }; $("followTag").hidden = true; renderScore(); clockUI();
   for (const t of [0, 1]) for (let i = 0; i < 11; i++) { names[t][i] = ""; prof[t][i] = {}; if (S3.ok) S3.setLabel(t, i + 1, ""); }
   SIZE = 11; $("size").value = 11; populateForms("4-3-3", "4-4-2");
   setLayers(id => LAYER_DEFAULT[id]); $("heatWho").value = "home"; $("heatPl").value = "all";
@@ -1746,6 +1836,242 @@ function toast(msg) { const el = $("toast"); if (!msg) return; el.textContent = 
 window.toast = toast;
 { let first = true; new MutationObserver(() => { if (first) { first = false; return; } toast($("hint").textContent); }).observe($("hint"), { childList: true, characterData: true, subtree: true }); first = false; }
 
+/* ===================== v4: clock, goals, sound, follow, summary ===================== */
+let matchLog = [], votes = {}, followT = { kind: "auto" };
+const mc = { sec: 0, extra: 0, half: 1, run: false, last: 0 };       // half: 1, "HT", 2, "FT"
+const pad2 = n => String(Math.floor(n)).padStart(2, "0");
+function clockLabel() {
+  const lim = mc.half === 1 || mc.half === "HT" ? 2700 : 5400;
+  if (mc.extra > 0 || mc.half === "HT" || mc.half === "FT") return lim / 60 + "+" + Math.max(1, Math.ceil(mc.extra / 60 - 1e-6)) + "'";
+  return Math.floor(mc.sec / 60) + 1 + "'";
+}
+function clockText() { const lim = mc.half === 1 || mc.half === "HT" ? 2700 : 5400; return mc.extra > 0 ? `${lim / 60}+${pad2(mc.extra / 60)}:${pad2(mc.extra % 60)}` : `${pad2(mc.sec / 60)}:${pad2(mc.sec % 60)}`; }
+function clockUI() {
+  $("hmin").textContent = clockText(); $("hper").textContent = { 1: "1st half", HT: "Half time", 2: "2nd half", FT: "Full time" }[mc.half];
+  $("hud").classList.toggle("run", mc.run);
+  $("clkGo").textContent = mc.run ? "Pause" : mc.half === "HT" ? "Start 2nd half" : mc.half === "FT" ? "Full time" : mc.sec > 0 ? "Resume" : "Start";
+  $("clkGo").disabled = mc.half === "FT";
+  const m = Math.min(90, Math.floor(mc.sec / 60)); $("clkMin").value = m; $("clkMinV").textContent = m;
+}
+function renderScore() {
+  const sc = [0, 1].map(t => matchLog.filter(g => g.type === "goal" && g.team === t).length);
+  $("hs0").textContent = sc[0]; $("hs1").textContent = sc[1]; $("hn0").textContent = tname(0); $("hn1").textContent = tname(1);
+  $("ht0").style.setProperty("--c", C.home); $("ht1").style.setProperty("--c", C.away);
+  $("goalLog").innerHTML = matchLog.length ? matchLog.map(g => `<div>${g.min} <b>${g.num ? (names[g.team][g.num - 1] || "#" + g.num) : "Goal"}</b> (${tname(g.team)})</div>`).join("") : "";
+  return sc;
+}
+setInterval(() => {
+  const now = performance.now(), dt = Math.min(.5, (now - mc.last) / 1000); mc.last = now;
+  if (!mc.run) return;
+  const a1 = +$("add1").value * 60, a2 = +$("add2").value * 60, lim = mc.half === 1 ? 2700 : 5400, add = mc.half === 1 ? a1 : a2, step = dt * +$("clkRate").value;
+  if (mc.sec < lim) { mc.sec = Math.min(lim, mc.sec + step); if (mc.sec >= lim && add === 0) endHalf(); }
+  else { mc.extra = Math.min(add, mc.extra + step); if (mc.extra >= add) endHalf(); }
+  clockUI();
+}, 100);
+function endHalf() {
+  mc.run = false;
+  if (mc.half === 1) { mc.half = "HT"; toast("Half time"); } else { mc.half = "FT"; toast("Full time. Press End match for the stats."); }
+}
+$("clkGo").onclick = () => {
+  if (mc.half === "FT") return;
+  if (mc.half === "HT") { mc.half = 2; mc.sec = 2700; mc.extra = 0; mc.run = true; }
+  else mc.run = !mc.run;
+  mc.last = performance.now(); clockUI();
+};
+$("clkReset").onclick = () => { Object.assign(mc, { sec: 0, extra: 0, half: 1, run: false }); clockUI(); };
+$("clkMin").oninput = e => { const m = +e.target.value; mc.run = false; mc.extra = 0; mc.half = m < 45 ? 1 : 2; mc.sec = m * 60; clockUI(); };
+$("goalH").onclick = () => registerGoal(0, null, "manual"); $("goalA").onclick = () => registerGoal(1, null, "manual");
+$("n0").addEventListener("input", renderScore); $("n1").addEventListener("input", renderScore); $("c0").addEventListener("input", renderScore); $("c1").addEventListener("input", renderScore);
+
+/* ----- crowd sound ----- */
+let AC = null, soundOn = true; try { soundOn = localStorage.getItem("tl_snd") !== "0"; } catch (_) {}
+const sndLab = () => { $("sndBtn").textContent = soundOn ? "Sound on" : "Sound off"; $("sndBtn").classList.toggle("on", soundOn); };
+$("sndBtn").onclick = () => { soundOn = !soundOn; try { localStorage.setItem("tl_snd", soundOn ? "1" : "0"); } catch (_) {} sndLab(); if (soundOn) crowdRoar(.35); };
+sndLab();
+function crowdRoar(vol = 1) {
+  if (!soundOn) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume();
+    const t = AC.currentTime, dur = 6, sr = AC.sampleRate, buf = AC.createBuffer(1, sr * dur, sr), d = buf.getChannelData(0);
+    let b0 = 0; for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; b0 = .985 * b0 + .015 * w; d[i] = (w * .5 + b0 * 7) * .6; }   // pinkish noise
+    const src = AC.createBufferSource(); src.buffer = buf;
+    const bp1 = AC.createBiquadFilter(); bp1.type = "bandpass"; bp1.Q.value = .6; bp1.frequency.setValueAtTime(450, t); bp1.frequency.linearRampToValueAtTime(1500, t + .7); bp1.frequency.linearRampToValueAtTime(800, t + dur);
+    const hs = AC.createBiquadFilter(); hs.type = "highshelf"; hs.frequency.value = 3000; hs.gain.value = 5;
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.95 * vol, t + .45); g.gain.setValueAtTime(.8 * vol, t + 2.2); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    const lfo = AC.createOscillator(), lg = AC.createGain(); lfo.frequency.value = 6.5; lg.gain.value = .12 * vol; lfo.connect(lg); lg.connect(g.gain); lfo.start(t); lfo.stop(t + dur);
+    src.connect(bp1); bp1.connect(hs); hs.connect(g); g.connect(AC.destination); src.start(t);
+    for (const [f0, f1] of [[196, 233], [247, 294], [330, 392]]) {                                                         // rising "ooooh" of the fans
+      const o = AC.createOscillator(); o.type = "sawtooth"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + 1.1);
+      const f = AC.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 900; f.Q.value = 2.5; const og = AC.createGain(); og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(.05 * vol, t + .5); og.gain.exponentialRampToValueAtTime(.001, t + 3.2);
+      o.connect(f); f.connect(og); og.connect(AC.destination); o.start(t); o.stop(t + 3.3);
+    }
+  } catch (_) {}
+}
+
+/* ----- goals ----- */
+const goalFired = new Set(), goalKeys = new Set(); let lastU = 0;
+function checkGoal() {
+  if (track || frames.length < 2) return;
+  if (u < lastU - .001) goalFired.clear(); lastU = u;
+  const i = Math.min(Math.floor(u), frames.length - 2); if (goalFired.has(i)) return;
+  const b = Motion.ballState(frames, segs, u);
+  if (b.z < 2.5 && Math.abs(b.y - H / 2) < 3.7 && (b.x > W + .05 || b.x < -.05)) {
+    goalFired.add(i); const team = b.x > W / 2 ? 0 : 1, k = b.kicker, st = k >= 0 && (k < 11 ? 0 : 1) === team ? k : -1;
+    registerGoal(team, st >= 0 ? st % 11 + 1 : null, "play", kfVersion + ":" + i);
+  }
+}
+function registerGoal(team, num, src, key) {
+  const fresh = !key || !goalKeys.has(key);
+  if (fresh) {
+    if (key) goalKeys.add(key);
+    matchLog.push({ type: "goal", team, num, min: clockLabel(), src });
+    if (num) { const pr = prof[team][num - 1]; pr.ev = pr.ev || {}; pr.ev.g = (pr.ev.g || 0) + 1; }
+  }
+  renderScore(); renderEv(); markPaths(); goalFx(team, num);
+}
+function goalFx(team, num) {
+  const nm = num ? (names[team][num - 1] || "#" + num) : "", gw = $("gwho"), fx2 = $("goalFx");
+  gw.textContent = (nm ? nm + "  |  " : "") + tname(team) + "  |  " + clockLabel(); gw.style.borderColor = team ? C.away : C.home;
+  fx2.hidden = true; void fx2.offsetWidth; fx2.hidden = false; clearTimeout(goalFx.t); goalFx.t = setTimeout(() => { fx2.hidden = true; }, 3300);
+  const v = $("view"); v.classList.remove("shake"); void v.offsetWidth; v.classList.add("shake");
+  confettiBurst(team ? C.away : C.home); crowdRoar(1);
+  if (S3.ok) S3.celebrate(team ? 0 : W, H / 2, num ? team * 11 + num - 1 : -1);
+}
+const cfv = $("confetti"), cfx = cfv.getContext("2d"); let cfP = [], cfRun = false;
+function confettiBurst(c1) {
+  const w = cfv.clientWidth, h = cfv.clientHeight; cfv.width = w; cfv.height = h; const cols = [c1, "#ff2a55", "#ffffff", "#ffc233", "#3ec1ff"];
+  for (let i = 0; i < 220; i++) cfP.push({ x: w / 2 + (Math.random() - .5) * w * .5, y: h * .35, vx: (Math.random() - .5) * 16, vy: -Math.random() * 13 - 3, r: Math.random() * 6 + 3, c: cols[i % 5], a: Math.random() * 6, va: (Math.random() - .5) * .5, life: 1 });
+  if (!cfRun) { cfRun = true; requestAnimationFrame(cfStep); }
+}
+function cfStep() {
+  cfx.clearRect(0, 0, cfv.width, cfv.height);
+  cfP.forEach(p => { p.vy += .32; p.x += p.vx; p.y += p.vy; p.a += p.va; p.vx *= .992; p.life -= .006; cfx.save(); cfx.globalAlpha = Math.max(0, p.life); cfx.translate(p.x, p.y); cfx.rotate(p.a); cfx.fillStyle = p.c; cfx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); cfx.restore(); });
+  cfP = cfP.filter(p => p.life > 0 && p.y < cfv.height + 20);
+  if (cfP.length) requestAnimationFrame(cfStep); else { cfRun = false; cfx.clearRect(0, 0, cfv.width, cfv.height); }
+}
+
+/* ----- formation preview + glide ----- */
+const fvc = $("fvis"), fvx = fvc.getContext("2d");
+function drawFvis() {
+  const w = fvc.width, h = fvc.height, sx = w / W, sy = h / H; fvx.clearRect(0, 0, w, h);
+  const g = fvx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#1f7a3a"); g.addColorStop(1, "#176130"); fvx.fillStyle = g; fvx.fillRect(0, 0, w, h);
+  for (let i = 0; i < 8; i++) if (i % 2) { fvx.fillStyle = "rgba(255,255,255,.04)"; fvx.fillRect(i * w / 8, 0, w / 8, h); }
+  fvx.strokeStyle = "rgba(255,255,255,.55)"; fvx.lineWidth = 2; fvx.strokeRect(4, 4, w - 8, h - 8); fvx.beginPath(); fvx.moveTo(w / 2, 4); fvx.lineTo(w / 2, h - 4); fvx.stroke();
+  fvx.beginPath(); fvx.arc(w / 2, h / 2, 9 * sy, 0, 7); fvx.stroke(); fvx.strokeRect(4, h / 2 - 20 * sy, 16.5 * sx, 40 * sy); fvx.strokeRect(w - 4 - 16.5 * sx, h / 2 - 20 * sy, 16.5 * sx, 40 * sy);
+  for (const p of players) {
+    if (p.num > SIZE) continue; const x = p.x * sx, y = p.y * sy, c = p.team ? C.away : C.home;
+    fvx.fillStyle = "rgba(0,0,0,.35)"; fvx.beginPath(); fvx.arc(x + 1.5, y + 2.5, 8, 0, 7); fvx.fill();
+    fvx.fillStyle = c; fvx.beginPath(); fvx.arc(x, y, 8, 0, 7); fvx.fill(); fvx.strokeStyle = "#fff"; fvx.lineWidth = 1.5; fvx.stroke();
+    fvx.fillStyle = lum(c) > .55 ? "#111" : "#fff"; fvx.font = "700 9.5px sans-serif"; fvx.textAlign = "center"; fvx.textBaseline = "middle"; fvx.fillText(p.num, x, y + .5);
+  }
+  fvx.font = "800 15px sans-serif"; fvx.textAlign = "left"; fvx.fillStyle = "#fff"; fvx.fillText($("fh").value, 12, 20); fvx.textAlign = "right"; fvx.fillText($("fa").value, w - 12, 20);
+}
+let glideId = 0;
+function glideFormation(team, name) {
+  const target = (formFor(name) || formFor(formNames()[0])).map(([d, y]) => [team ? W - d : d, y]), from = target.map((_, i) => [players[team * 11 + i].x, players[team * 11 + i].y]), t0 = performance.now(), id = ++glideId;
+  if (name && FORM_INFO[name]) toast(name + ": " + FORM_INFO[name][0]);
+  const run = now => {
+    if (id !== glideId) return; const k = Math.min(1, (now - t0) / 520), e = 1 - Math.pow(1 - k, 3);
+    target.forEach(([x, y], i) => { const p = players[team * 11 + i]; p.x = from[i][0] + (x - from[i][0]) * e; p.y = from[i][1] + (y - from[i][1]) * e; });
+    drawFvis(); draw(); if (k < 1) requestAnimationFrame(run);
+  };
+  requestAnimationFrame(run);
+}
+{ const old = setFormation; setFormation = function (t, n) { old(t, n); drawFvis(); }; }
+$("c0").addEventListener("input", drawFvis); $("c1").addEventListener("input", drawFvis);
+
+/* ----- follow picker ----- */
+function openFollow() {
+  const list = $("fList"); list.innerHTML = "";
+  for (const t of [0, 1]) for (let i = 1; i <= SIZE; i++) {
+    const b = document.createElement("button"), pr = prof[t][i - 1] || {}, nm = names[t][i - 1];
+    b.innerHTML = `<b style="background:${t ? C.away : C.home}">${i}</b><span>${nm || "#" + i}<br><small style="color:var(--mute)">${tname(t)}${pr.pos ? " | " + pr.pos : ""}</small></span>`;
+    b.onclick = () => setFollow({ kind: "player", team: t, num: i }); list.append(b);
+  }
+  $("followDlg").hidden = false; $("fBall").focus();
+}
+function setFollow(f) {
+  followT = f; $("followDlg").hidden = true; const tag = $("followTag");
+  if (!mode3d) setMode3d(true);
+  if (f.kind === "ball") S3.setCamera("ballcam"); else S3.setCamera("follow");
+  cam3Name = f.kind === "ball" ? "ballcam" : "follow"; updateCamButtons();
+  tag.hidden = false; tag.textContent = "Following: " + (f.kind === "ball" ? "the ball" : f.kind === "auto" ? "the player on the ball" : (names[f.team][f.num - 1] || "#" + f.num) + " (" + tname(f.team) + ")") + "   change";
+}
+$("fBall").onclick = () => setFollow({ kind: "ball" }); $("fAuto").onclick = () => setFollow({ kind: "auto" }); $("fClose").onclick = () => { $("followDlg").hidden = true; };
+$("followDlg").addEventListener("click", e => { if (e.target === $("followDlg")) $("followDlg").hidden = true; });
+$("followTag").onclick = openFollow;
+
+/* ----- end of match: stats, rating, vote ----- */
+function computeStats() {
+  const rows = [], key = (t, n) => t * 11 + n - 1;
+  for (const t of [0, 1]) for (let n = 1; n <= SIZE; n++) rows[key(t, n)] = { team: t, num: n, name: names[t][n - 1] || "", dist: 0, top: 0, pass: 0, shot: 0, sot: 0, carry: 0, goals: 0, assists: 0, y: 0, r: 0, poss: 0 };
+  let hasData = false, samples = 0, possN = [0, 0];
+  if (track) {
+    hasData = true; const fps = track.fps || 25;
+    for (let f = 1; f < track.frames.length; f++) for (const p of track.frames[f].players) {
+      const q = track.frames[f - 1].players.find(o => o.id === p.id && o.team === p.team), n = (p.id - 1) % 11 + 1, r = rows[key(p.team, n)]; if (!q || !r) continue;
+      const d = Math.hypot(p.x - q.x, p.y - q.y); if (d > 5) continue; r.dist += d; r.top = Math.max(r.top, d * fps);
+    }
+    for (const f of track.frames) { const b = f.ball && (f.ball.x !== undefined ? f.ball : { x: f.ball[0], y: f.ball[1] }); if (!b) continue; let bd = 1e9, bt = 0; for (const p of f.players) { const d = Math.hypot(p.x - b.x, p.y - b.y); if (d < bd) { bd = d; bt = p.team; } } possN[bt]++; samples++; }
+  } else if (frames.length > 1) {
+    hasData = true; const L = frames.length - 1, step = .05; let prev = Motion.posAt(frames, 0);
+    for (let uu = step; uu <= L + 1e-9; uu += step) {
+      const cur = Motion.posAt(frames, uu);
+      for (let k = 0; k < 22; k++) { const r = rows[key(k < 11 ? 0 : 1, k % 11 + 1)]; if (!r) continue; const d = Math.hypot(cur[k][0] - prev[k][0], cur[k][1] - prev[k][1]); r.dist += d; r.top = Math.max(r.top, d / (step * SEC)); }
+      const bs = Motion.ballState(frames, segs, uu); let bd = 1e9, bt = 0; for (let k = 0; k < 22; k++) { const d = Math.hypot(cur[k][0] - bs.x, cur[k][1] - bs.y); if (d < bd) { bd = d; bt = k < 11 ? 0 : 1; } } possN[bt]++; samples++;
+      prev = cur;
+    }
+    for (let i = 0; i < L; i++) {
+      const k = Motion.kickerOf(frames, i), sg = Motion.getSeg(segs, i); if (sg.carrier != null && rows[sg.carrier]) rows[sg.carrier].carry++;
+      if (k < 0) continue; const r = rows[key(k < 11 ? 0 : 1, k % 11 + 1)]; if (!r) continue;
+      const end = frames[i + 1][22], kind = Motion.resolveKick(sg, end);
+      if (kind === "shot") { r.shot++; if (Math.abs(end[1] - H / 2) < 3.7 && (end[0] > W || end[0] < 0)) r.sot++; } else r.pass++;
+    }
+  }
+  for (const g of matchLog) if (g.num && rows[key(g.team, g.num)]) { hasData = true; rows[key(g.team, g.num)].goals++; }
+  for (const r of rows) { if (!r) continue; const e = evOf(prof[r.team][r.num - 1]); r.assists = e.a || 0; r.y = e.y || 0; r.r = e.r || 0; if (r.assists || r.y || r.r || e.g || e.off || e.inj) hasData = true; }
+  const sc = [0, 1].map(t => matchLog.filter(g => g.team === t).length), maxD = Math.max(1, ...rows.filter(Boolean).map(r => r.dist));
+  for (const r of rows) {
+    if (!r) continue; const clean = SIZE >= 5 && r.num === 1 && sc[1 - r.team] === 0 && hasData;
+    r.rating = Math.max(4, Math.min(10, 6 + r.goals * 1.2 + r.assists * .7 + r.shot * .15 + r.sot * .2 + r.pass * .12 + r.carry * .15 + (r.dist / maxD) * .9 - r.y * .4 - r.r * 1.8 + (clean ? .6 : 0)));
+    r.rating = Math.round(r.rating * 10) / 10;
+  }
+  const team = t => { const rs = rows.filter(r => r && r.team === t); return { goals: sc[t], shots: rs.reduce((a, r) => a + r.shot, 0), sot: rs.reduce((a, r) => a + r.sot, 0), pass: rs.reduce((a, r) => a + r.pass, 0), dist: rs.reduce((a, r) => a + r.dist, 0) / 1000, top: Math.max(0, ...rs.map(r => r.top)) * 3.6, y: rs.reduce((a, r) => a + r.y, 0), r: rs.reduce((a, r) => a + r.r, 0), poss: samples ? Math.round(possN[t] / samples * 100) : 0 }; };
+  return { rows: rows.filter(Boolean), teams: [team(0), team(1)], hasData, sc };
+}
+const rname = r => r.name || (tname(r.team) + " #" + r.num);
+function avatarCss(r) { const pr = prof[r.team][r.num - 1] || {}; return pr.photo ? `background-image:url(${pr.photo})` : `background:${r.team ? C.away : C.home}`; }
+function renderSummary() {
+  const st = computeStats(), ranked = st.rows.slice().sort((a, b) => b.rating - a.rating || b.dist - a.dist), best = ranked[0];
+  $("sScore").textContent = `${tname(0)}  ${st.sc[0]}  -  ${st.sc[1]}  ${tname(1)}   (${clockLabel()})`;
+  $("sGoals").textContent = matchLog.length ? matchLog.map(g => `${g.min} ${g.num ? (names[g.team][g.num - 1] || "#" + g.num) : "Goal"} (${tname(g.team)})`).join("   |   ") : "No goals recorded.";
+  $("sPotm").innerHTML = best ? `<div class="potm"><div class="pic" style="${avatarCss(best)}">${(prof[best.team][best.num - 1] || {}).photo ? "" : best.num}</div><div><h3>Player of the match (from the data)</h3><div class="nm">${rname(best)}</div><div style="color:var(--mute);font-size:13px">${tname(best.team)}${(prof[best.team][best.num - 1] || {}).pos ? " | " + prof[best.team][best.num - 1].pos : ""}</div><div class="chipline"><span>${best.goals} goals</span><span>${best.assists} assists</span><span>${best.shot} shots</span><span>${best.pass} passes</span><span>${(best.dist / 1000).toFixed(2)} km</span><span>${(best.top * 3.6).toFixed(1)} km/h top</span></div></div><div class="rt">${best.rating.toFixed(1)}</div></div>` : "";
+  $("sTop").innerHTML = ranked.slice(0, 5).map((r, i) => `<div class="rrow"><b>${i + 1}</b><div>${rname(r)} <span style="color:var(--mute);font-size:11px">${tname(r.team)}</span><div class="bar3"><i style="width:${(r.rating - 4) / 6 * 100}%"></i></div></div><b>${r.rating.toFixed(1)}</b></div>`).join("");
+  $("sNote").textContent = st.hasData ? "Rating = 6.0 + goals, assists, shots, passes, ball carrying and distance covered, minus cards, plus a clean-sheet bonus for keepers. It is a simple model, not an official rating. Distance and speed come from the keyframe timing (1.6 s per keyframe)." : "No movement data yet. Build a move with keyframes (or load tracking) and record goals and cards to get real ratings.";
+  const T0 = st.teams[0], T1 = st.teams[1], row = (lab, a, b, fmt = x => x) => { const tot = (+a || 0) + (+b || 0) || 1; return `<tr><td style="text-align:right;font-weight:800">${fmt(a)}</td><td class="m">${lab}<div class="bar2" style="margin:4px 0 0"><i style="width:${(+a || 0) / tot * 100}%;background:${C.home}"></i><i style="width:${(+b || 0) / tot * 100}%;background:${C.away}"></i></div></td><td style="font-weight:800">${fmt(b)}</td></tr>`; };
+  $("sTeam").innerHTML = `<table class="stbl"><tr><td style="text-align:right;color:${C.home};font-weight:800">${tname(0)}</td><td></td><td style="color:${C.away};font-weight:800">${tname(1)}</td></tr>${row("Goals", T0.goals, T1.goals)}${row("Shots", T0.shots, T1.shots)}${row("On target", T0.sot, T1.sot)}${row("Passes", T0.pass, T1.pass)}${row("Possession", T0.poss, T1.poss, x => x + "%")}${row("Distance (km)", T0.dist.toFixed(2), T1.dist.toFixed(2))}${row("Top speed (km/h)", T0.top.toFixed(1), T1.top.toFixed(1))}${row("Yellow cards", T0.y, T1.y)}${row("Red cards", T0.r, T1.r)}</table>`;
+  const tot = r => votes[r.team + ":" + r.num] || 0, lead = st.rows.slice().sort((a, b) => tot(b) - tot(a))[0];
+  $("vLead").innerHTML = lead && tot(lead) ? `Fans' pick: <b style="color:var(--warn)">${rname(lead)}</b> with ${tot(lead)} vote${tot(lead) > 1 ? "s" : ""}.${best && lead !== best ? " (The data picked " + rname(best) + ".)" : best ? " The data agrees." : ""}` : "No votes yet. Tap Vote on your best player.";
+  $("sVote").innerHTML = st.rows.map(r => `<div class="vcard ${lead && tot(lead) && r === lead ? "lead" : ""}"><div class="vb" style="${avatarCss(r)}">${(prof[r.team][r.num - 1] || {}).photo ? "" : r.num}</div><div class="vn">${rname(r)}<small>${tname(r.team)} | rating ${r.rating.toFixed(1)}</small></div><span class="vc">${tot(r)}</span><button data-k="${r.team}:${r.num}">Vote</button></div>`).join("");
+  $("sVote").querySelectorAll("button").forEach(b => b.onclick = () => { votes[b.dataset.k] = (votes[b.dataset.k] || 0) + 1; renderSummary(); });
+  renderSummary.last = st;
+}
+function openSummary() { mc.run = false; clockUI(); renderSummary(); $("summary").hidden = false; $("sClose").focus(); }
+$("endMatch").onclick = $("endMatch2").onclick = openSummary; $("sClose").onclick = () => { $("summary").hidden = true; };
+$("vReset").onclick = () => { votes = {}; renderSummary(); };
+$("sCsv").onclick = () => {
+  const st = renderSummary.last || computeStats(), head = "team,number,name,rating,goals,assists,shots,on_target,passes,carries,distance_m,top_speed_kmh,yellow,red,votes";
+  const lines = st.rows.map(r => [tname(r.team), r.num, `"${rname(r)}"`, r.rating, r.goals, r.assists, r.shot, r.sot, r.pass, r.carry, r.dist.toFixed(1), (r.top * 3.6).toFixed(1), r.y, r.r, votes[r.team + ":" + r.num] || 0].join(","));
+  download(new Blob([head + "\n" + lines.join("\n")], { type: "text/csv" }), "match-stats.csv");
+};
+document.addEventListener("keydown", e => { if (e.key === "Escape") { if (!$("summary").hidden) $("summary").hidden = true; if (!$("followDlg").hidden) $("followDlg").hidden = true; } });
+
+/* ----- slick tab indicator ----- */
+function moveInd() { const on = document.querySelector("#tabbar button.on"), ind = document.querySelector("#tabbar .ind"); if (on && ind) { ind.style.width = on.offsetWidth + "px"; ind.style.transform = `translateX(${on.offsetLeft}px)`; } }
+{ const sw = switchTab; switchTab = function (n, t) { sw(n, t); moveInd(); document.querySelectorAll("aside>.card").forEach((c, i) => { c.style.animationDelay = Math.min(i, 5) * 45 + "ms"; }); }; window.switchTab = switchTab; }
+window.addEventListener("resize", moveInd); setTimeout(moveInd, 50);
+
+renderScore(); clockUI(); drawFvis();
 fillCarrier(); refreshBallCard(); fillProfile(); renderEv(); applySizeInit();
 function applySizeInit() { $("size").value = SIZE; }
 loadDemoMove(); computeMoments(); sizeAll();

@@ -12,7 +12,7 @@
   const lum = hex => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
   const col = h => new window.THREE.Color(h).convertSRGBToLinear();
   const S3 = window.S3 = { ok: false, quality: "high", playerScale: 1.12, ballScale: 1.0 };
-  let T, renderer, scene, camera, host, sun, hemi, clock;
+  let T, renderer, scene, camera, host, sun, hemi, clock, shake = 0, celeb = null, conf = null, flashUntil = 0;
   let rigs = [], ballMesh, ballShadow, ballTrail, pathsGroup, areaGroup, overlayTex, overlayMesh, flags = [], flashes = [], goalsFull = [];
   const kit = { c: ["#f2c14e", "#5fb0e8"], gk: ["#2fd47b", "#ff8a3d"] };
   const labels = {};                                   // "team:num" -> name
@@ -224,9 +224,12 @@
   function geoms() {
     if (G) return G;
     const cyl = (a, b, h, s, ty) => { const g = new T.CylinderGeometry(a, b, h, s || 14); if (ty) g.translate(0, ty, 0); return g; };
+    const lathe = (pts, n) => new T.LatheGeometry(pts.map(q => new T.Vector2(q[0], q[1])), n || 18);
     G = {
-      torso: cyl(.2, .165, .58, 22), upper: cyl(.056, .048, .3, 12, -.15), fore: cyl(.046, .038, .27, 12, -.135), hand: new T.SphereGeometry(.05, 10, 8),
-      glove: new T.SphereGeometry(.075, 10, 8), thigh: cyl(.088, .068, .46, 14, -.23), shortsLeg: cyl(.1, .112, .22, 14, -.11), shorts: cyl(.19, .2, .26, 20), shin: cyl(.064, .046, .42, 14, -.21),
+      torso: lathe([[.001, -.29], [.15, -.29], [.168, -.2], [.172, -.05], [.19, .12], [.212, .23], [.19, .27], [.1, .29], [.001, .29]], 26),
+      band: new T.CylinderGeometry(.178, .178, .05, 26, 1, true), collar: new T.TorusGeometry(.07, .014, 8, 20).rotateX(Math.PI / 2), ear: new T.SphereGeometry(.024, 8, 6), nose: new T.SphereGeometry(.02, 8, 6), eye: new T.SphereGeometry(.012, 6, 5),
+      sockBand: new T.CylinderGeometry(.068, .066, .035, 14), tuft: new T.SphereGeometry(.05, 10, 8), upper: cyl(.056, .048, .3, 12, -.15), fore: cyl(.046, .038, .27, 12, -.135), hand: new T.SphereGeometry(.05, 10, 8),
+      glove: new T.SphereGeometry(.075, 10, 8), thigh: lathe([[.001, 0], [.07, 0], [.092, -.08], [.094, -.2], [.08, -.34], [.066, -.46], [.001, -.46]], 16), shortsLeg: cyl(.1, .112, .22, 14, -.11), shorts: cyl(.19, .2, .26, 20), shin: lathe([[.001, 0], [.058, 0], [.07, -.1], [.064, -.22], [.048, -.38], [.05, -.42], [.001, -.42]], 16),
       boot: new T.BoxGeometry(.105, .075, .29).translate(0, -.03, .075), head: new T.SphereGeometry(.105, 22, 16), hair: new T.SphereGeometry(.111, 22, 10, 0, TAU, 0, 1.75), neck: cyl(.046, .052, .1, 10),
       blob: new T.PlaneGeometry(1.9, 1.9).rotateX(-Math.PI / 2), ring: new T.RingGeometry(.95, 1.12, 48).rotateX(-Math.PI / 2), cone: new T.CylinderGeometry(.9, 2.7, 22, 28, 1, true).translate(0, 11, 0)
     };
@@ -240,6 +243,9 @@
     });
     mats.skin = skinTones.map(c => new T.MeshStandardMaterial({ color: col(c), roughness: .62 })); mats.hair = hairTones.map(c => new T.MeshStandardMaterial({ color: col(c), roughness: .8 }));
     mats.boot = new T.MeshStandardMaterial({ color: col(0x0d0f14), roughness: .35, metalness: .25 });
+    mats.boots = [0x0d0f14, 0xf2f2f2, 0xff7a1a, 0x1ec8ff, 0xc6ff2e].map(c => new T.MeshStandardMaterial({ color: col(c), roughness: .32, metalness: .3 }));
+    mats.eye = new T.MeshBasicMaterial({ color: col(0x120d0a) });
+    ["0", "1"].forEach(t => { mats["trim" + t] = new T.MeshStandardMaterial({ roughness: .8, side: T.DoubleSide }); });
     mats.blob = new T.MeshBasicMaterial({ map: blobTexture(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, fog: false });
     mats.ring = new T.MeshBasicMaterial({ color: col(0xffffff), transparent: true, opacity: .95, depthWrite: false, toneMapped: false });
     mats.cone = new T.MeshBasicMaterial({ color: col(0xffffff), transparent: true, opacity: .2, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, toneMapped: false });
@@ -249,7 +255,7 @@
     for (const t of [0, 1]) {
       const c = col(kit.c[t]), l = lum(kit.c[t]);
       mats["shirt" + t].color.copy(c); mats["sleeve" + t].color.copy(c).multiplyScalar(.92);
-      mats["shorts" + t].color.copy(col(l > .56 ? dark : white)); mats["sock" + t].color.copy(c);
+      mats["shorts" + t].color.copy(col(l > .56 ? dark : white)); mats["sock" + t].color.copy(c); mats["trim" + t].color.copy(col(l > .56 ? dark : white));
       mats["gk" + t].color.copy(col(kit.gk[t])); mats["gkShorts" + t].color.copy(col(dark)); mats["glove" + t].color.copy(col(l > .5 ? "#ffffff" : "#d8ff3c"));
     }
     rigs.forEach(r => labelRig(r));
@@ -265,9 +271,14 @@
     hips.position.y = .95; root.add(hips);
     const shorts = cast(new T.Mesh(g.shorts, mats["shorts" + k])); shorts.position.y = -.02; shorts.scale.z = .78; hips.add(shorts);
     const shirt = cast(new T.Mesh(g.torso, mats["shirt" + k])); shirt.position.y = .35; shirt.scale.set(1.12, 1, .62); torso.add(shirt);
+    const band = new T.Mesh(g.band, mats["trim" + k]); band.position.y = .43; band.scale.set(1.13, 1, .63); torso.add(band);
+    const collar = new T.Mesh(g.collar, mats["trim" + k]); collar.position.y = .645; collar.scale.z = .85; torso.add(collar);
     const neck = new T.Mesh(g.neck, skin); neck.position.y = .66; torso.add(neck);
     const head = cast(new T.Mesh(g.head, skin)); head.position.y = .79; head.scale.set(.95, 1.12, 1); torso.add(head);
     const hr = new T.Mesh(g.hair, hair); hr.position.set(0, .795, -.012); hr.scale.set(.95, 1.12, 1.02); torso.add(hr);
+    for (const sx of [-1, 1]) { const ear = new T.Mesh(g.ear, skin); ear.position.set(sx * .1, .79, 0); ear.scale.set(.6, 1.2, 1); torso.add(ear); const eye = new T.Mesh(g.eye, mats.eye); eye.position.set(sx * .038, .81, .098); torso.add(eye); }
+    const nose = new T.Mesh(g.nose, skin); nose.position.set(0, .785, .105); nose.scale.set(.8, 1, 1.2); torso.add(nose);
+    const style = (num + team) % 3; if (style === 1) { const tf = new T.Mesh(g.tuft, hair); tf.position.set(0, .91, -.03); torso.add(tf); } else if (style === 2) { const hb = new T.Mesh(g.band, mats["trim" + k]); hb.scale.set(.6, .9, .6); hb.position.y = .83; torso.add(hb); }
     const numMesh = new T.Mesh(new T.PlaneGeometry(.3, .3), new T.MeshBasicMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, toneMapped: false }));
     numMesh.position.set(0, .38, -.136); numMesh.rotation.y = Math.PI; torso.add(numMesh);
     const arm = s => {
@@ -277,7 +288,8 @@
     };
     const armL = arm(-1), armR = arm(1);
     const leg = s => {
-      const hp = new T.Group(), th = cast(new T.Mesh(g.thigh, skin)), sl = cast(new T.Mesh(g.shortsLeg, mats["shorts" + k])), kn = new T.Group(), sn = cast(new T.Mesh(g.shin, mats["sock" + k])), bt = cast(new T.Mesh(g.boot, mats.boot)), an = new T.Group();
+      const hp = new T.Group(), th = cast(new T.Mesh(g.thigh, skin)), sl = cast(new T.Mesh(g.shortsLeg, mats["shorts" + k])), kn = new T.Group(), sn = cast(new T.Mesh(g.shin, mats["sock" + k])), bt = cast(new T.Mesh(g.boot, mats.boots[(num + team * 3) % 5])), an = new T.Group(), sb = new T.Mesh(g.sockBand, mats["trim" + k]);
+      sb.position.y = -.07; sn.add(sb);
       hp.position.set(s * .098, -.02, 0); kn.position.y = -.46; an.position.y = -.42; an.add(bt); kn.add(sn, an); hp.add(th, sl, kn); hips.add(hp); return { hp, kn, an };
     };
     const legL = leg(-1), legR = leg(1);
@@ -335,6 +347,7 @@
         hipY = mix(hipY, hy); lean = mix(lean, ln === 0 ? lean : ln); twist = mix(twist, tw); aL = mix(aL, kl ? a2 : a1); aR = mix(aR, kl ? a1 : a2); eL = mix(eL, e1); eR = mix(eR, e2); azL = mix(azL, z1); azR = mix(azR, z2);
       }
     }
+    if (p.celeb) { aL = aR = -2.7; eL = eR = -.25; azL = -.55; azR = .55; hipY += .14 * Math.abs(Math.sin(tNow * 8)); lean = -.1; }
     r.hips.position.y = hipY; r.legL.hp.rotation.x = tL; r.legR.hp.rotation.x = tR; r.legL.kn.rotation.x = kL; r.legR.kn.rotation.x = kR;
     r.legL.an.rotation.x = -.35 * kL; r.legR.an.rotation.x = -.35 * kR;
     r.armL.sh.rotation.x = aL; r.armR.sh.rotation.x = aR; r.armL.el.rotation.x = eL; r.armR.el.rotation.x = eR; r.armL.sh.rotation.z = azL; r.armR.sh.rotation.z = azR;
@@ -390,7 +403,7 @@
   const PRESETS = {
     broadcast: { az: 0, el: .40, dist: 82, fov: 30, follow: "ball" }, sideline: { az: 0, el: .15, dist: 46, fov: 40, follow: "ball" }, end: { az: Math.PI / 2, el: .30, dist: 76, fov: 32, follow: "ball" },
     high: { az: 0, el: .88, dist: 98, fov: 32, follow: "none" }, top: { az: 0, el: 1.52, dist: 118, fov: 35, follow: "none" }, orbit: { az: .55, el: .5, dist: 86, fov: 30, follow: "none" }, drone: { az: .5, el: .45, dist: 70, fov: 34, follow: "ball" },
-    follow: { az: 0, el: .22, dist: 15, fov: 52, follow: "player" }
+    follow: { az: 0, el: .22, dist: 15, fov: 52, follow: "player" }, ballcam: { az: .35, el: .3, dist: 17, fov: 46, follow: "ballclose" }
   };
   S3.setCamera = function (name) {
     const p = PRESETS[name]; if (!p) return; cam.mode = name; cam.follow = p.follow; cam.drone = name === "drone";
@@ -410,10 +423,12 @@
     const k = 1 - Math.exp(-dt * 3.6), g = cam.g, b = model && model.ball;
     if (cam.drone) g.az += dt * .09;
     if (cam.follow === "ball" && b) { const f = cam.mode === "end" ? .45 : .62; g.tx = clamp((b.x - W / 2) * f, -34, 34); g.tz = cam.mode === "end" ? clamp((b.y - H / 2) * .4, -12, 12) : clamp((b.y - H / 2) * .18, -6, 6); g.ty = 1; }
+    else if (cam.follow === "ballclose" && b) { g.tx = b.x - W / 2; g.tz = b.y - H / 2; g.ty = Math.max(.9, (b.z || 0) * .6 + .8); }
     else if (cam.follow === "player" && model && model.followIdx !== undefined && rigs[model.followIdx] && rigs[model.followIdx].root.visible) { const r = rigs[model.followIdx]; g.tx = r.root.position.x; g.tz = r.root.position.z; g.ty = 1.3; g.az = r.heading + Math.PI + Math.round((cam.az - r.heading - Math.PI) / TAU) * TAU; }
     cam.az += (g.az - cam.az) * k; cam.el += (g.el - cam.el) * k; cam.dist += (g.dist - cam.dist) * k; cam.fov += (g.fov - cam.fov) * k;
     const kt = 1 - Math.exp(-dt * 4.5); cam.tx += (g.tx - cam.tx) * kt; cam.ty += (g.ty - cam.ty) * kt; cam.tz += (g.tz - cam.tz) * kt;
     const ce = Math.cos(cam.el); camera.position.set(cam.tx + cam.dist * ce * Math.sin(cam.az), Math.max(.6, cam.ty + cam.dist * Math.sin(cam.el)), cam.tz + cam.dist * ce * Math.cos(cam.az));
+    if (shake > 0) { camera.position.x += (Math.random() - .5) * shake; camera.position.y += (Math.random() - .5) * shake * .6; camera.position.z += (Math.random() - .5) * shake; shake = Math.max(0, shake - dt * 1.6); }
     camera.fov = cam.fov; camera.updateProjectionMatrix(); camera.lookAt(cam.tx, cam.ty, cam.tz); camera.updateMatrixWorld();
   }
 
@@ -480,7 +495,7 @@
     for (const p of model.players) {
       const idx = p.team * 11 + p.num - 1, r = rigs[idx]; if (!r) continue;
       seen.add(idx); r.root.visible = true; setGK(r, !!p.gk);
-      r.root.position.set(p.x - W / 2, 0, p.y - H / 2); pose(r, p, dt, ad, model.ball ? [model.ball.x, model.ball.y] : null);
+      r.root.position.set(p.x - W / 2, 0, p.y - H / 2); p.celeb = !!(celeb && celeb.idx === idx && tNow < celeb.until); pose(r, p, dt, ad, model.ball ? [model.ball.x, model.ball.y] : null);
       r.ring.visible = !!p.sel; r.cone.visible = !!p.spot; if (p.sel) r.ring.rotation.y += dt * .8;
       r.blob.visible = true;
     }
@@ -499,10 +514,33 @@
       pos.needsUpdate = true; ballTrail.visible = ad > 0 && hist.length > 3;
     } else { ballMesh.visible = false; ballShadow.visible = false; ballTrail.visible = false; ballPrev = null; }
     flags.forEach((f, i) => { f.rotation.y = Math.sin(tNow * 3 + i) * .35; f.rotation.z = Math.sin(tNow * 5 + i * 2) * .06; });
-    flashes.forEach(fl => { const v = Math.sin(tNow * fl.f * 9 + fl.p); fl.pts.material.opacity = v > .94 ? 1 : 0; });
+    flashes.forEach(fl => { const v = Math.sin(tNow * fl.f * 9 + fl.p); fl.pts.material.opacity = (v > .94 || (tNow < flashUntil && v > .35)) ? 1 : 0; });
+    stepFx(dt);
     stepCamera(dt, model);
     renderer.render(scene, camera);
   };
+  S3.celebrate = function (x, y, idx) {
+    if (!S3.ok) return; const N = 520, pos = new Float32Array(N * 3), colr = new Float32Array(N * 3), vel = [], palette = [[1, .16, .33], [1, .8, .2], [1, 1, 1], [.3, .8, 1]];
+    const gx = x > W / 2 ? W / 2 - 1.5 : -W / 2 + 1.5;
+    for (let i = 0; i < N; i++) {
+      pos[i * 3] = gx + (Math.random() - .5) * 6; pos[i * 3 + 1] = 2 + Math.random() * 3; pos[i * 3 + 2] = (Math.random() - .5) * 10;
+      const c = palette[i % 4]; colr.set(c, i * 3); const dir = gx > 0 ? -1 : 1;
+      vel.push([dir * (Math.random() * 9 + 1), 6 + Math.random() * 12, (Math.random() - .5) * 14]);
+    }
+    if (conf) { scene.remove(conf.pts); conf.pts.geometry.dispose(); }
+    const geo = new T.BufferGeometry(); geo.setAttribute("position", new T.BufferAttribute(pos, 3)); geo.setAttribute("color", new T.BufferAttribute(colr, 3));
+    const pts = new T.Points(geo, new T.PointsMaterial({ size: .34, vertexColors: true, transparent: true, depthWrite: false, toneMapped: false })); pts.frustumCulled = false; scene.add(pts);
+    conf = { pts, vel, t: 0 }; celeb = { idx, until: tNow + 5 }; shake = .9; flashUntil = tNow + 3; S3._exposure = 2.1;
+  };
+  function stepFx(dt) {
+    if (conf) {
+      conf.t += dt; const a = conf.pts.geometry.attributes.position;
+      for (let i = 0; i < conf.vel.length; i++) { const v = conf.vel[i]; v[1] -= 9.8 * dt * .8; a.array[i * 3] += v[0] * dt; a.array[i * 3 + 1] = Math.max(.05, a.array[i * 3 + 1] + v[1] * dt); a.array[i * 3 + 2] += v[2] * dt; if (a.array[i * 3 + 1] <= .06) { v[0] *= .9; v[2] *= .9; v[1] = 0; } }
+      a.needsUpdate = true; conf.pts.material.opacity = clamp(1 - (conf.t - 3.5) / 1.5, 0, 1);
+      if (conf.t > 5) { scene.remove(conf.pts); conf.pts.geometry.dispose(); conf = null; }
+    }
+    S3._exposure = lerp(S3._exposure || 1.12, 1.12, 1 - Math.exp(-dt * 2.2)); renderer.toneMappingExposure = S3._exposure;
+  }
   S3.snapshot = () => S3.canvas;
   S3._dbg = () => ({ scene, camera, renderer });
 })();
